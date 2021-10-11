@@ -1,0 +1,33 @@
+{
+  "name": "petsapp-desafio",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev:be": "nodemon --watch './server/index.ts' --exec 'ts-node ./server/index.ts'",
+    "dev:fe": "parcel serve ./public/index.html --dist-dir ./public-dist",
+    "dev": "yarn dev:fe && yarn dev:be",
+    "build:be": "tsc",
+    "build:fe": "parcel build ./public/index.html --dist-dir ./public-dist",
+    "build": "yarn build:be && yarn build:fe",
+    "start": "node ./server/index.js"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^7.4.7",
+    "@vaadin/router": "^1.7.4",
+    "algoliasearch": "^4.10.5",
+    "bearer-token": "^2.0.2",
+    "cloudinary": "^1.27.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "dropzone": "^5.9.3",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mapbox": "^1.0.0-beta10",
+    "nodemon": "^2.0.12",
+    "parcel": "^2.0.0-rc.0",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.6.5",
+    "typescript": "^4.4.3"
+  }
+}
