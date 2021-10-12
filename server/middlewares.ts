@@ -24,7 +24,6 @@ export async function checkId(req, res, next) {
 export async function middlewareToken(req, res, next) {
   //check if the token received was signed with Secret key
   bearerToken(req, async (err, token) => {
-    console.log(err, token);
     if (token) {
       try {
         req._user = jwt.verify(token, process.env.SECRET);
@@ -38,9 +37,14 @@ export async function middlewareToken(req, res, next) {
   });
 }
 
-export function getSHA256ofSTRING(input: string) {
+export function getSHA256ofSTRING(req, res, next) {
   //create a hash "sha256" from an input (password)
-  return crypto.createHash("sha256").update(input).digest("hex");
+  const { password } = req.body;
+  req._SHA256Password = crypto
+    .createHash("sha256")
+    .update(password)
+    .digest("hex");
+  next();
 }
 
 export function createToken(id) {
