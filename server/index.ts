@@ -1,4 +1,5 @@
-require("dotenv").config();
+//Enviroment
+import "./enviroment";
 //Connection
 import "./models/db/connection";
 import "./models/db/sync";
@@ -27,12 +28,14 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 app.use(express.json({ limit: "100mb" }));
 
+//---------------------------------------API TESTER
 app.get("/test", async (req, res) => {
   //endpoint de test
   const allUsers = await UserController.getAll();
   res.json(allUsers);
 });
 
+//---------------------------------------AUTH
 app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
   //crear un User y un Auth; y devuelve el User.
   //recibe en el body: {email, password, lat, lng, state}
@@ -72,11 +75,39 @@ app.get("/me", checkBody, middlewareToken, async (req, res) => {
   }
 });
 
+app.post("/me", checkBody, middlewareToken, async (req, res) => {
+  //Devuelve el usuario correspondiente a un token
+  const id = req._user.id;
+  try {
+    const user = await UserController.update(id, req.body);
+    res.status(201).json(user);
+  } catch (err) {
+    res.status(401).json(err);
+  }
+});
+
+app.get("/me/pets", checkBody, middlewareToken, async (req, res) => {
+  //Devuelve el usuario correspondiente a un token
+  const id = req._user.id;
+  try {
+    const user = await UserController.myPets(id);
+    res.status(201).json(user);
+  } catch (err) {
+    res.status(401).json(err);
+  }
+});
+
+//---------------------------------------AUTH
+
+//---------------------------------------STATICS
 app.use(express.static(path.resolve(__dirname, "../fe-dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../fe-dist/index.html"));
 });
 
+//---------------------------------------LISTENER
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(
+    `\x1b[1m \x1b[31m Server is running on port ${PORT}... \n  and the enviroment is ${process.env.ENVIROMENT}...\x1b[31m \x1b[37m`
+  );
 });
