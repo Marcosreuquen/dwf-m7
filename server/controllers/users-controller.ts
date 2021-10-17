@@ -1,4 +1,4 @@
-import { Pets, User } from "../models";
+import { Pets, Reports, User } from "../models";
 
 export const UserController = {
   async getAll() {
@@ -28,5 +28,8 @@ export const UserController = {
   },
   async myPets(id) {
     return await (await User.findByPk(id, { include: [Pets] })).get("pets");
+  },
+  async myReports(id) {
+    return await (await User.findByPk(id, { include: [Reports] })).get("reports");
   },
 };

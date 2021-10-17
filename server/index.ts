@@ -54,7 +54,6 @@ app.post("/auth/token", checkBody, getSHA256ofSTRING, async (req, res) => {
   //Este endpoint chequea en la tabla auth que esos datos concuerden con los guardados y genera un token con un objeto que tenga solo el id del user.
   const { email } = req.body;
   const auth = await AuthController.findOne(email, req._SHA256Password);
-  console.log(auth);
   const token = createToken(auth.get("user_id"));
 
   if (auth) {
@@ -90,8 +89,8 @@ app.get("/me/pets", checkBody, middlewareToken, async (req, res) => {
   //Devuelve el usuario correspondiente a un token
   const id = req._user.id;
   try {
-    const user = await UserController.myPets(id);
-    res.status(201).json(user);
+    const myPets = await UserController.myPets(id);
+    res.status(201).json(myPets);
   } catch (err) {
     res.status(401).json(err);
   }
@@ -101,6 +100,7 @@ app.get("/me/pets", checkBody, middlewareToken, async (req, res) => {
 app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
   // Verifica el token y crea una mascota como perdida. Carga imagen en cloudinary y el objeto en algolia.
   const { name, img, lat, lng } = req.body;
+  try {
 
   const imgURL = await uploadImgToCloudinary(img);
 
@@ -116,7 +116,6 @@ app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
       lng: petCreated.get("lng"),
     },
   });
-  try {
     res.status(201).json(petCreated, algoliaRes);
   } catch (err) {
     res.json(err);
@@ -129,6 +128,7 @@ app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
   const { id } = req.query;
   const imgURL = await uploadImgToCloudinary(img);
 
+  try {
   const petUpdated = await PetsController.updatePet(
     { name, lat, lng, imgURL },
     id
@@ -141,7 +141,6 @@ app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
       lng: petUpdated.get("lng"),
     },
   });
-  try {
     res.status(201).json(petUpdated, algoliaRes);
   } catch (err) {
     res.json(err);
@@ -151,12 +150,12 @@ app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
 app.get("/pets/around", async (req, res) => {
   //Busca en algolia mascotas perdidas cerca de un punto.
   const { lat, lng } = req.query;
-
+  
+  try {
   const { hits } = await pets_index_algolia.search("", {
     aroundLatLng: `${lat},${lng}`,
   });
 
-  try {
     res.send(hits);
   } catch (err) {
     res.send(err);
@@ -165,18 +164,56 @@ app.get("/pets/around", async (req, res) => {
 
 app.get("/pets/:petId", async (req, res) => {
   const { petId } = req.query;
-  const pet = await PetsController.findOne(petId);
   try {
+  const pet = await PetsController.findOne(petId);
     res.status(200).json(pet);
   } catch (err) {
     res.json(err);
   }
 });
-//DELETE/me/pets -> Verifica el token y marca una mascota como encontrada.
 
-//POST/pets/report -> Verifica el token y reporta una mascota. Recbe Authorization bearer token + body:{name,tel,report}. Se requiere sendgrid.
+app.delete("/me/pets/:petId", middlewareToken, async (req,res)=>{
+  //DELETE/me/pets -> Verifica el token y marca una mascota como encontrada (eliminada).
+  const {petId} = req.query;
+  try{
+  const deletedPet = await PetsController.deletePet(petId);
+    if(deletedPet){
+      res.status(200).json({message:`Pet ${petId} has been deleted succesfully`});
+    }else{
+      res.status(404).json({message: `Has been an error deleting pet: ${petId}`});
+    }
+  }catch(err){
+    res.send(err);
+  }
+});
 
-//GET/me/reports -> Verifica el token y busca en Reports los reportes hechos por el user. recibe Auth bearer token.
+app.get("/me/reports", middlewareToken, async (req,res)=>{
+  //GET/me/reports -> Verifica el token y busca en Reports los reportes hechos por el user. recibe Auth bearer token.
+  const id = req._user.id;
+  try{
+  const reports = await UserController.myReports(id);
+    res.status(200).json(reports);
+  }catch(err){
+    res.status(401).json(err)
+  };
+});
+
+app.post("/pets/report/:petId", checkBody, middlewareToken, async (req,res)=>{
+  //POST/pets/report -> Verifica el token y reporta una mascota. Recbe Authorization bearer token + body:{name,tel,report}. Se requiere sendgrid.
+  const {petId} = req.query;
+  const userId = req._user.id;
+  const data = req.body;
+  try{
+    const created = (await ReportsController.sendReport(petId,userId,data)).get();
+    const user = created.users;
+    const pet = created.pets
+    const sendedEmail = await sendEmail(user.email, created.tel, pet.name, created.report);
+    
+    res.status(200)
+  }catch(err){
+    res.send(401)
+  };
+});
 //---------------------------------------STATICS
 app.use(express.static(path.resolve(__dirname, "../fe-dist")));
 app.get("*", (req, res) => {

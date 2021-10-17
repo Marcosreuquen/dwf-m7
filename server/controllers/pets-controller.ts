@@ -25,6 +25,13 @@ export const PetsController = {
     });
     return petUpdated;
   },
+  async deletePet(pet_id):Promise<boolean> {
+    const pet = await Pets.findByPk(pet_id);
+    const petUpdated = await pet.update({
+      state: false,
+    });
+    return true;
+  },
   async findOne(id: number) {
     return await Pets.findByPk(id);
   },
