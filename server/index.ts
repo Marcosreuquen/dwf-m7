@@ -12,7 +12,7 @@ import { PetsController } from "./controllers/pets-controller";
 import { ReportsController } from "./controllers/repots-controller";
 import { AuthController } from "./controllers/auths-controller";
 //libs
-import { cloudinary } from "./lib/cloudinary";
+import { cloudinary, uploadImgToCloudinary } from "./lib/cloudinary";
 import { pets_index_algolia, users_index_algolia } from "./lib/algolia";
 import { sendEmail } from "./lib/sendgrid";
 //middlewares
@@ -38,7 +38,7 @@ app.get("/test", async (req, res) => {
 //---------------------------------------AUTH
 app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
   //crear un User y un Auth; y devuelve el User.
-  //recibe en el body: {email, password, lat, lng, state}
+  //recibe en el body: {email, password, lat, lng }
 
   const data = req.body;
   const { user, created } = await UserController.findOrCreate(data);
@@ -75,7 +75,7 @@ app.get("/me", checkBody, middlewareToken, async (req, res) => {
   }
 });
 
-app.post("/me", checkBody, middlewareToken, async (req, res) => {
+app.put("/me", checkBody, middlewareToken, async (req, res) => {
   //Devuelve el usuario correspondiente a un token
   const id = req._user.id;
   try {
@@ -97,8 +97,86 @@ app.get("/me/pets", checkBody, middlewareToken, async (req, res) => {
   }
 });
 
-//---------------------------------------AUTH
+//---------------------------------------PETS
+app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
+  // Verifica el token y crea una mascota como perdida. Carga imagen en cloudinary y el objeto en algolia.
+  const { name, img, lat, lng } = req.body;
 
+  const imgURL = await uploadImgToCloudinary(img);
+
+  const petCreated = await PetsController.newLostPet(
+    { name, lat, lng, imgURL },
+    req._user.id
+  );
+  const algoliaRes = await pets_index_algolia.saveObject({
+    objectID: petCreated.get("id"),
+    name: petCreated.get("name"),
+    _geoloc: {
+      lat: petCreated.get("lat"),
+      lng: petCreated.get("lng"),
+    },
+  });
+  try {
+    res.status(201).json(petCreated, algoliaRes);
+  } catch (err) {
+    res.json(err);
+  }
+});
+
+app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
+  //Verifica el token, y modifica una mascota en db, algolia y cloudinary.
+  const { name, img, lat, lng } = req.body;
+  const { id } = req.query;
+  const imgURL = await uploadImgToCloudinary(img);
+
+  const petUpdated = await PetsController.updatePet(
+    { name, lat, lng, imgURL },
+    id
+  );
+  const algoliaRes = await pets_index_algolia.partialUpdateObject({
+    objectID: petUpdated.get("id"),
+    name: petUpdated.get("name"),
+    _geoloc: {
+      lat: petUpdated.get("lat"),
+      lng: petUpdated.get("lng"),
+    },
+  });
+  try {
+    res.status(201).json(petUpdated, algoliaRes);
+  } catch (err) {
+    res.json(err);
+  }
+});
+
+app.get("/pets/around", async (req, res) => {
+  //Busca en algolia mascotas perdidas cerca de un punto.
+  const { lat, lng } = req.query;
+
+  const { hits } = await pets_index_algolia.search("", {
+    aroundLatLng: `${lat},${lng}`,
+  });
+
+  try {
+    res.send(hits);
+  } catch (err) {
+    res.send(err);
+  }
+});
+
+app.get("/pets/:petId", async (req, res) => {
+  const { petId } = req.query;
+  const pet = await PetsController.findOne(petId);
+  try {
+    res.status(200).json(pet);
+  } catch (err) {
+    res.json(err);
+  }
+});
+//DELETE/me/pets -> Verifica el token y marca una mascota como encontrada.
+
+//POST/pets/report -> Verifica el token y reporta una mascota. Recbe Authorization bearer token + body:{name,tel,report}. Se requiere sendgrid.
+
+//GET/me/reports -> Verifica el token y busca en Reports los reportes hechos por el user. recibe Auth bearer token.
 //---------------------------------------STATICS
 app.use(express.static(path.resolve(__dirname, "../fe-dist")));
 app.get("*", (req, res) => {
