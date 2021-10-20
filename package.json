@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev:be": "nodemon --watch './server/index.ts' --exec 'ts-node ./server/index.ts'",
-    "dev:fe": "parcel serve ./public/index.html --dist-dir ./public-dist",
+    "dev:fe": "parcel serve './public/index.html'",
     "dev": "yarn dev:fe && yarn dev:be",
     "build:be": "tsc",
     "build:fe": "parcel build ./public/index.html --dist-dir ./public-dist",

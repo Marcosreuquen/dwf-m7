@@ -1,6 +1,6 @@
 //import mapbox, mapboxtoken, mapboxgl
 import { MapboxClient, mapboxgl } from "mapbox";
-
+//navigator.geolocation.getCurrentPosition(loc=>console.log(loc))
 const mapboxClient = new MapboxClient(process.env.MAPBOX_TOKEN);
 
 function initMap() {

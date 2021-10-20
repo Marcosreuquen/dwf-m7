@@ -31,8 +31,14 @@ app.use(express.json({ limit: "100mb" }));
 //---------------------------------------API TESTER
 app.get("/test", async (req, res) => {
   //endpoint de test
-  const allUsers = await UserController.getAll();
-  res.json(allUsers);
+  //  const allUsers = await UserController.getAll();
+  const sendedEmail = await sendEmail(
+    "marcosreuquendiaz@gmail.com",
+    123456,
+    "pet.name",
+    "created.report"
+  );
+  res.json(sendedEmail);
 });
 
 //---------------------------------------AUTH
@@ -101,21 +107,20 @@ app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
   // Verifica el token y crea una mascota como perdida. Carga imagen en cloudinary y el objeto en algolia.
   const { name, img, lat, lng } = req.body;
   try {
+    const imgURL = await uploadImgToCloudinary(img);
 
-  const imgURL = await uploadImgToCloudinary(img);
-
-  const petCreated = await PetsController.newLostPet(
-    { name, lat, lng, imgURL },
-    req._user.id
-  );
-  const algoliaRes = await pets_index_algolia.saveObject({
-    objectID: petCreated.get("id"),
-    name: petCreated.get("name"),
-    _geoloc: {
-      lat: petCreated.get("lat"),
-      lng: petCreated.get("lng"),
-    },
-  });
+    const petCreated = await PetsController.newLostPet(
+      { name, lat, lng, imgURL },
+      req._user.id
+    );
+    const algoliaRes = await pets_index_algolia.saveObject({
+      objectID: petCreated.get("id"),
+      name: petCreated.get("name"),
+      _geoloc: {
+        lat: petCreated.get("lat"),
+        lng: petCreated.get("lng"),
+      },
+    });
     res.status(201).json(petCreated, algoliaRes);
   } catch (err) {
     res.json(err);
@@ -129,18 +134,18 @@ app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
   const imgURL = await uploadImgToCloudinary(img);
 
   try {
-  const petUpdated = await PetsController.updatePet(
-    { name, lat, lng, imgURL },
-    id
-  );
-  const algoliaRes = await pets_index_algolia.partialUpdateObject({
-    objectID: petUpdated.get("id"),
-    name: petUpdated.get("name"),
-    _geoloc: {
-      lat: petUpdated.get("lat"),
-      lng: petUpdated.get("lng"),
-    },
-  });
+    const petUpdated = await PetsController.updatePet(
+      { name, lat, lng, imgURL },
+      id
+    );
+    const algoliaRes = await pets_index_algolia.partialUpdateObject({
+      objectID: petUpdated.get("id"),
+      name: petUpdated.get("name"),
+      _geoloc: {
+        lat: petUpdated.get("lat"),
+        lng: petUpdated.get("lng"),
+      },
+    });
     res.status(201).json(petUpdated, algoliaRes);
   } catch (err) {
     res.json(err);
@@ -150,11 +155,11 @@ app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
 app.get("/pets/around", async (req, res) => {
   //Busca en algolia mascotas perdidas cerca de un punto.
   const { lat, lng } = req.query;
-  
+
   try {
-  const { hits } = await pets_index_algolia.search("", {
-    aroundLatLng: `${lat},${lng}`,
-  });
+    const { hits } = await pets_index_algolia.search("", {
+      aroundLatLng: `${lat},${lng}`,
+    });
 
     res.send(hits);
   } catch (err) {
@@ -165,59 +170,76 @@ app.get("/pets/around", async (req, res) => {
 app.get("/pets/:petId", async (req, res) => {
   const { petId } = req.query;
   try {
-  const pet = await PetsController.findOne(petId);
+    const pet = await PetsController.findOne(petId);
     res.status(200).json(pet);
   } catch (err) {
     res.json(err);
   }
 });
 
-app.delete("/me/pets/:petId", middlewareToken, async (req,res)=>{
+app.delete("/me/pets/:petId", middlewareToken, async (req, res) => {
   //DELETE/me/pets -> Verifica el token y marca una mascota como encontrada (eliminada).
-  const {petId} = req.query;
-  try{
-  const deletedPet = await PetsController.deletePet(petId);
-    if(deletedPet){
-      res.status(200).json({message:`Pet ${petId} has been deleted succesfully`});
-    }else{
-      res.status(404).json({message: `Has been an error deleting pet: ${petId}`});
+  const { petId } = req.query;
+  try {
+    const deletedPet = await PetsController.deletePet(petId);
+    if (deletedPet) {
+      res
+        .status(200)
+        .json({ message: `Pet ${petId} has been deleted succesfully` });
+    } else {
+      res
+        .status(404)
+        .json({ message: `Has been an error deleting pet: ${petId}` });
     }
-  }catch(err){
+  } catch (err) {
     res.send(err);
   }
 });
 
-app.get("/me/reports", middlewareToken, async (req,res)=>{
+app.get("/me/reports", middlewareToken, async (req, res) => {
   //GET/me/reports -> Verifica el token y busca en Reports los reportes hechos por el user. recibe Auth bearer token.
   const id = req._user.id;
-  try{
-  const reports = await UserController.myReports(id);
+  try {
+    const reports = await UserController.myReports(id);
     res.status(200).json(reports);
-  }catch(err){
-    res.status(401).json(err)
-  };
+  } catch (err) {
+    res.status(401).json(err);
+  }
 });
 
-app.post("/pets/report/:petId", checkBody, middlewareToken, async (req,res)=>{
-  //POST/pets/report -> Verifica el token y reporta una mascota. Recbe Authorization bearer token + body:{name,tel,report}. Se requiere sendgrid.
-  const {petId} = req.query;
-  const userId = req._user.id;
-  const data = req.body;
-  try{
-    const created = (await ReportsController.sendReport(petId,userId,data)).get();
-    const user = created.users;
-    const pet = created.pets
-    const sendedEmail = await sendEmail(user.email, created.tel, pet.name, created.report);
-    
-    res.status(200)
-  }catch(err){
-    res.send(401)
-  };
-});
+app.post(
+  "/pets/report/:petId",
+  checkBody,
+  middlewareToken,
+  async (req, res) => {
+    //POST/pets/report -> Verifica el token y reporta una mascota. Recbe Authorization bearer token + body:{name,tel,report}. Se requiere sendgrid.
+    const { petId } = req.query;
+    const userId = req._user.id;
+    const data = req.body;
+    try {
+      const created = (
+        await ReportsController.sendReport(petId, userId, data)
+      ).get();
+      const user = created.users;
+      const pet = created.pets;
+      const sendedEmail = await sendEmail(
+        user.email,
+        created.tel,
+        pet.name,
+        created.report
+      );
+
+      res.status(200);
+    } catch (err) {
+      res.send(401);
+    }
+  }
+);
 //---------------------------------------STATICS
-app.use(express.static(path.resolve(__dirname, "../fe-dist")));
+
+app.use(express.static(path.resolve(__dirname, "../public-dist")));
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../fe-dist/index.html"));
+  res.sendFile(path.resolve(__dirname, "../public-dist/index.html"));
 });
 
 //---------------------------------------LISTENER
