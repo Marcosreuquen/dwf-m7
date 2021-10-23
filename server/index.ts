@@ -23,10 +23,13 @@ import {
   getSHA256ofSTRING,
   middlewareToken,
 } from "./middlewares";
+//cors aux
+import * as cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 app.use(express.json({ limit: "100mb" }));
+app.use(cors());
 
 //---------------------------------------API TESTER
 app.get("/test", async (req, res) => {
@@ -113,6 +116,7 @@ app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
       { name, lat, lng, imgURL },
       req._user.id
     );
+
     const algoliaRes = await pets_index_algolia.saveObject({
       objectID: petCreated.get("id"),
       name: petCreated.get("name"),
@@ -160,8 +164,7 @@ app.get("/pets/around", async (req, res) => {
     const { hits } = await pets_index_algolia.search("", {
       aroundLatLng: `${lat},${lng}`,
     });
-
-    res.send(hits);
+    res.json(hits);
   } catch (err) {
     res.send(err);
   }
@@ -237,9 +240,9 @@ app.post(
 );
 //---------------------------------------STATICS
 
-app.use(express.static(path.resolve(__dirname, "../public-dist")));
+app.use(express.static(path.resolve(__dirname, "../dist")));
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../public-dist/index.html"));
+  res.sendFile(path.resolve(__dirname, "../dist/index.html"));
 });
 
 //---------------------------------------LISTENER
