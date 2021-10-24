@@ -120,6 +120,7 @@ app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
     const algoliaRes = await pets_index_algolia.saveObject({
       objectID: petCreated.get("id"),
       name: petCreated.get("name"),
+      imgURL: petCreated.get("imgUrl"),
       _geoloc: {
         lat: petCreated.get("lat"),
         lng: petCreated.get("lng"),
@@ -145,6 +146,7 @@ app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
     const algoliaRes = await pets_index_algolia.partialUpdateObject({
       objectID: petUpdated.get("id"),
       name: petUpdated.get("name"),
+      imgURL: petUpdated.get("imgUrl"),
       _geoloc: {
         lat: petUpdated.get("lat"),
         lng: petUpdated.get("lng"),

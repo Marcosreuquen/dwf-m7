@@ -8,6 +8,22 @@ function initRouter(root: Element) {
       path: `/welcome`,
       component: "x-welcome",
     },
+    {
+      path: `/login`,
+      component: "x-login",
+    },
+    {
+      path: `/my-data`,
+      component: "x-my-data",
+    },
+    {
+      path: `/pet-data`,
+      component: "x-pet-data",
+    },
+    {
+      path: `/my-pets`,
+      component: "x-my-pets",
+    },
   ]);
 
   if (location.pathname === "/") {
