@@ -25,20 +25,6 @@ class MyPets extends HTMLElement {
       },
     ]);
   }
-  addStyle() {
-    const styles = document.createElement("style");
-    styles.textContent = `
-    .login{
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-      height: 100%;
-    }
-    `;
-    this.appendChild(styles);
-  }
   render(pets?) {
     this.innerHTML = `
       <div>
@@ -55,8 +41,6 @@ class MyPets extends HTMLElement {
       </div>
       </div>
     `;
-
-    this.addStyle();
   }
 }
 customElements.define("x-my-pets", MyPets);

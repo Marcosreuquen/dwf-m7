@@ -4,20 +4,6 @@ class WelcomePage extends HTMLElement {
   connectedCallback() {
     this.render();
   }
-  addStyle() {
-    const styles = document.createElement("style");
-    styles.textContent = `
-    .welcome{
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-      height: 100%;
-    }
-    `;
-    this.appendChild(styles);
-  }
   addListenerGeoloc() {
     const cs = state.getState();
     this.querySelector("x-button").addEventListener("buttonClicked", (e) => {
@@ -62,38 +48,6 @@ class WelcomePage extends HTMLElement {
     </form>
     `;
     div.className = "report-pet";
-    const style = document.createElement("style");
-    style.textContent = `
-    .report-pet{
-      position: absolute;
-      left: 10%;
-      right: 10%;
-      bottom: 10%;
-      top: 10%;
-      border: 2px solid #444;
-      border-radius: 8px;
-      background-color: #eee;
-      padding: 44px 23px;
-    }
-    .report-pet__form{
-      display: flex;
-      flex-direction: column;
-      gap:18px;
-    }
-    .report-pet__label{
-      display: flex;
-      flex-direction: column;
-    }
-    .report-pet__input{
-      height: 50px;
-      width: 90%;
-      border-radius: 4px;
-      background: #FFFFFF;
-      border: 2px solid #000000;
-      box-sizing: border-box;
-    }
-    `;
-    div.appendChild(style);
     this.appendChild(div);
   }
   render(pets?) {
@@ -129,7 +83,6 @@ class WelcomePage extends HTMLElement {
     `;
       this.addListenerPetReport();
     }
-    this.addStyle();
   }
 }
 customElements.define("x-welcome", WelcomePage);

@@ -33,9 +33,8 @@ class Login extends HTMLElement {
       </form>
     </div>
     `;
-    this.querySelector(".login").addEventListener("submit", (e) => {
+    this.querySelector(".login").addEventListener("submit", (e:any) => {
       e.preventDefault();
-      console.log(e);
       this.renderPass(e.target.email.value);
     });
     this.addStyle();
@@ -55,10 +54,13 @@ class Login extends HTMLElement {
     </form>
     </div>
     `;
-    this.querySelector(".login").addEventListener("submit", (e) => {
+    this.querySelector(".login").addEventListener("submit", async (e:any) => {
       e.preventDefault();
-      console.log({ email, pass: e.target.password.value });
-      Router.go("/my-data");
+      const userData = { email, password: e.target.password.value }
+      await state.createOrFindUser(userData).then((res)=>{
+        Router.go("/my-data");
+
+      })
     });
     this.addStyle();
   }

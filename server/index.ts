@@ -55,7 +55,7 @@ app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
     user.get("id"),
     { email: data.email, password: req._SHA256Password }
   );
-  res.status(201).json(user);
+  res.status(201).json(user, created);
 });
 
 app.post("/auth/token", checkBody, getSHA256ofSTRING, async (req, res) => {

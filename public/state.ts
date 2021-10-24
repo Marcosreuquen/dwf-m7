@@ -23,4 +23,17 @@ export const state = {
       `http://localhost:8080/pets/around?lat=${_geoloc.lat}&lng=${_geoloc.lng}`
     );
   },
+  async createOrFindUser(userData:{email:string, password:string}){
+    const {user, created} = await (await fetch("/auth", { 
+      method: "POST", 
+      headers:{
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(userData)
+    })).json();
+    const cs = this.getState();
+    cs.user = user;
+    cs.user.created = created;
+    this.setState(cs)
+  }
 };

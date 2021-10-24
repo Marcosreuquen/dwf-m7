@@ -3,23 +3,10 @@ import { state } from "../state";
 
 class MyData extends HTMLElement {
   connectedCallback() {
-    this.render();
+    const cs = state.getState()
+    cs.user.created? this.render(cs.user) : this.render();
   }
-  addStyle() {
-    const styles = document.createElement("style");
-    styles.textContent = `
-    .login{
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-      height: 100%;
-    }
-    `;
-    this.appendChild(styles);
-  }
-  render() {
+  render(userData?) {
     this.innerHTML = `
       <div>
       <x-navbar></x-navbar>
@@ -41,8 +28,6 @@ class MyData extends HTMLElement {
       </form>
     </div>
     `;
-
-    this.addStyle();
   }
 }
 customElements.define("x-my-data", MyData);

@@ -10,20 +10,6 @@ class PetData extends HTMLElement {
       id: 1,
     });
   }
-  addStyle() {
-    const styles = document.createElement("style");
-    styles.textContent = `
-    .login{
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-      height: 100%;
-    }
-    `;
-    this.appendChild(styles);
-  }
   render(pet?) {
     const type = pet ? "Editar" : "Reportar";
 
@@ -53,8 +39,6 @@ class PetData extends HTMLElement {
       </form>
     </div>
     `;
-
-    this.addStyle();
   }
 }
 customElements.define("x-pet-data", PetData);
