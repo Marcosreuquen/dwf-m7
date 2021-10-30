@@ -5,20 +5,6 @@ class Login extends HTMLElement {
   connectedCallback() {
     this.render();
   }
-  addStyle() {
-    const styles = document.createElement("style");
-    styles.textContent = `
-    .login{
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-      height: 100%;
-    }
-    `;
-    this.appendChild(styles);
-  }
   render() {
     this.innerHTML = `
       <div>
@@ -33,11 +19,21 @@ class Login extends HTMLElement {
       </form>
     </div>
     `;
-    this.querySelector(".login").addEventListener("submit", (e:any) => {
-      e.preventDefault();
-      this.renderPass(e.target.email.value);
-    });
-    this.addStyle();
+    const form = this.querySelector(".login");
+    form
+      .querySelector("x-button")
+      .addEventListener("buttonClicked", async (e) => {
+        console.log(e, form.email.value);
+        const { exist } = await state.checkMail(form.email.value);
+        if (exist) {
+          this.renderPass(form.email.value);
+        } else {
+          (() => {
+            state.saveMail(form.email.value);
+            Router.go("/my-data");
+          })();
+        }
+      });
   }
   renderPass(email) {
     console.log(email);
@@ -54,15 +50,17 @@ class Login extends HTMLElement {
     </form>
     </div>
     `;
-    this.querySelector(".login").addEventListener("submit", async (e:any) => {
-      e.preventDefault();
-      const userData = { email, password: e.target.password.value }
-      await state.createOrFindUser(userData).then((res)=>{
-        Router.go("/my-data");
 
-      })
-    });
-    this.addStyle();
+    const form = this.querySelector(".login");
+    form
+      .querySelector("x-button")
+      .addEventListener("buttonClicked", async (e: any) => {
+        e.preventDefault();
+        const userData = { email, password: form.password.value };
+        await state.createOrFindUser(userData).then((res) => {
+          Router.go("/my-data");
+        });
+      });
   }
 }
 customElements.define("x-login", Login);

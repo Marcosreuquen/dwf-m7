@@ -1,0 +1,24 @@
+.pet-data {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+}
+
+.pet-data label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 335px;
+}
+.pet-data input {
+  height: 50px;
+  margin-bottom: 15px;
+}
+
+.pet-data x-text div {
+  max-width: 335px;
+}

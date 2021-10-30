@@ -24,7 +24,8 @@ class ButtonComponent extends HTMLElement {
   }
   addListener() {
     // add an appropriate event listener
-    this.addEventListener("click", () => {
+    this.addEventListener("click", (e) => {
+      e.preventDefault();
       this.dispatchEvent(
         new CustomEvent("buttonClicked", { detail: { name: "Manz" } })
       );

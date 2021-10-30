@@ -1,6 +1,6 @@
 const huella = require("url:../assets/huella.png");
 const burger = require("url:../assets/burger.png");
-
+import { state } from "../state";
 class NavBar extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -15,6 +15,7 @@ class NavBar extends HTMLElement {
     });
   }
   render() {
+    const cs = state.getState();
     this.innerHTML = `
     <div class="navbar">
       <a href="/welcome">
@@ -29,8 +30,12 @@ class NavBar extends HTMLElement {
             <a class="menu__link-selection" href="/pet-data">Reportar mascota</a>
           </ul>
           <footer class="menu__session-options">
-            <label class="menu__email">email</label>
-            <a class="menu__logout">CERRAR SESION</a>
+            <label class="menu__email">${
+              cs.user?.email ? cs.user.email : ""
+            }</label>
+            <a class="menu__logout" href="/login">${
+              cs.user?.token ? "CERRAR SESION" : "INICIAR SESION"
+            }</a>
           </footer>
         </div>
       </div>

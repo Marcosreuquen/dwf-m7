@@ -3,30 +3,21 @@ import { state } from "../state";
 
 class MyPets extends HTMLElement {
   connectedCallback() {
-    this.render([
-      {
-        name: "nyme",
-        imgURL:
-          "https://hips.hearstapps.com/es.h-cdn.co/mcres/images/mi-casa/terraza-jardines-porche/cuidados-gatos-lactantes/1471229-1-esl-ES/me-he-encontrado-un-gatito-que-hago.jpg",
-        _geoloc: { lat: 1, lng: 2 },
-        id: 1,
-      },
-      {
-        name: "nyme",
-        imgURL: "",
-        _geoloc: { lat: 1, lng: 2 },
-        id: 1,
-      },
-      {
-        name: "nyme",
-        imgURL: "",
-        _geoloc: { lat: 1, lng: 2 },
-        id: 1,
-      },
-    ]);
+    state
+      .getMyPets()
+      .then((r) => {
+        r.json((myPets) => {
+          console.log(myPets);
+          this.render(myPets);
+        });
+      })
+      .catch(() => {
+        this.render();
+      });
   }
   render(pets?) {
-    this.innerHTML = `
+    this.innerHTML = pets
+      ? `
       <div>
       <x-navbar></x-navbar>
       <x-text type="title" style="bold">Mis mascotas reportadas</x-text>
@@ -40,6 +31,13 @@ class MyPets extends HTMLElement {
         }
       </div>
       </div>
+    `
+      : `
+    <div>
+      <x-navbar></x-navbar>
+      <x-text type="title" style="bold">Mis mascotas reportadas</x-text>
+      <x-text type="subtitle">Aun no reportaste mascotas perdidas</x-text>
+    </div>
     `;
   }
 }

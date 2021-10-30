@@ -3,12 +3,12 @@ import { state } from "../state";
 
 class MyData extends HTMLElement {
   connectedCallback() {
-    const cs = state.getState()
-    cs.user.created? this.render(cs.user) : this.render();
+    const cs = state.getState();
+    cs.user ? this.render(cs.user) : Router.go("login");
   }
   render(userData?) {
     this.innerHTML = `
-      <div>
+      <div class="my-data">
       <x-navbar></x-navbar>
       <form class="login">
         <x-text type="title" style="bold">Mis datos</x-text>
@@ -28,6 +28,20 @@ class MyData extends HTMLElement {
       </form>
     </div>
     `;
+
+    if (userData) {
+      const loginForm: any = this.querySelector(".login");
+      loginForm.name.value = userData.name;
+    }
+
+    const formLogin = this.addEventListener("submit", async (e: any) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      const value = Object.fromEntries(data.entries());
+      const update = await state.updateUser(value);
+
+      console.log(update);
+    });
   }
 }
 customElements.define("x-my-data", MyData);

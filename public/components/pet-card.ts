@@ -27,11 +27,22 @@ class PetCard extends HTMLElement {
       flex-direction: column;
       justify-content: space-around;
     }
-    .pet-card__link{}
+    .pet-card__link{
+      cursor: pointer;
+    }
     `;
     this.appendChild(style);
   }
-  addListener() {}
+  addListener(id) {
+    this.querySelector(".report").addEventListener("click", (e) => {
+      e.preventDefault();
+      this.dispatchEvent(new CustomEvent("report-pet", { detail: { id } }));
+    });
+    this.querySelector(".info").addEventListener("click", (e) => {
+      e.preventDefault();
+      this.dispatchEvent(new CustomEvent("info-pet", { detail: { id } }));
+    });
+  }
   render() {
     const name = this.textContent;
     const img = this.getAttribute("img");
@@ -43,14 +54,14 @@ class PetCard extends HTMLElement {
       <div class="pet-card__body">
         <x-text type="subtitle" style="bold">${name}</x-text>
         <ul class="pet-card__links">
-          <a class="pet-card__link">REPORTAR</a>
-          <a class="pet-card__link">INFORMACIÓN</a>
+          <a class="pet-card__link report">REPORTAR</a>
+          <a class="pet-card__link info">INFORMACIÓN</a>
         </ul>
         </div>
     </div>
     `;
     this.addStyle();
-    this.addListener();
+    this.addListener(id);
   }
 }
 customElements.define("x-pet-card", PetCard);

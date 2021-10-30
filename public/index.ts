@@ -11,8 +11,10 @@ import "./pages/login";
 import "./pages/my-data";
 import "./pages/pet-data";
 import "./pages/my-pets";
+import { state } from "./state";
 
 (() => {
   console.log("funcionando");
   initRouter(document.querySelector("#root"));
+  state.init();
 })();

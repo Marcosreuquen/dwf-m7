@@ -1,0 +1,14 @@
+.my-data {
+  height: 100%;
+}
+.login label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 335px;
+}
+.login input {
+  height: 50px;
+  margin-bottom: 15px;
+}

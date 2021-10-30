@@ -30,6 +30,12 @@ export const UserController = {
     return await (await User.findByPk(id, { include: [Pets] })).get("pets");
   },
   async myReports(id) {
-    return await (await User.findByPk(id, { include: [Reports] })).get("reports");
+    return await (
+      await User.findByPk(id, { include: [Reports] })
+    ).get("reports");
+  },
+  async userExist(email: string) {
+    const user = await User.findOne({ where: { email } });
+    return user ? true : false;
   },
 };

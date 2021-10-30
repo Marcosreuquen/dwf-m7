@@ -1,3 +1,4 @@
+import { Router } from "@vaadin/router";
 import { state } from "../state";
 
 class WelcomePage extends HTMLElement {
@@ -9,28 +10,42 @@ class WelcomePage extends HTMLElement {
     this.querySelector("x-button").addEventListener("buttonClicked", (e) => {
       navigator.geolocation.getCurrentPosition(async (geo) => {
         const { latitude, longitude } = geo.coords;
-        console.info({ lat: latitude, lng: longitude });
-        cs.user._geoloc = { lat: latitude, lng: longitude };
+        cs._geoloc = { lat: latitude, lng: longitude };
         state.setState(cs);
-        const pets = await (
-          await state.getPetsAroundMe(cs.user._geoloc)
-        ).json();
-        console.log(pets);
+        const pets = await (await state.getPetsAroundMe()).json();
         this.render(pets);
       });
     });
   }
   addListenerPetReport() {
+    const cs = state.getState();
     const pets = document.querySelectorAll("x-pet-card");
     for (const pet of pets) {
-      pet.addEventListener("click", (e) => {
-        this.reportPet({ name: "nyme" });
+      pet.addEventListener("report-pet", (e) => {
+        if (cs.user?.id) {
+          this.reportPet({
+            id: pet.getAttribute("petId"),
+            name: pet.getAttribute("petName"),
+          });
+        } else {
+          Router.go("/login");
+        }
+      });
+      pet.addEventListener("info-pet", (e) => {
+        if (cs.user?.id) {
+          state.setPetData({ id: Number(pet.getAttribute("petId")) });
+          Router.go("/pet-data");
+        } else {
+          Router.go("/login");
+        }
       });
     }
   }
   reportPet(pet) {
+    console.log(pet);
     const div = document.createElement("div");
     div.innerHTML = `
+    <div class="exit">X</div>
     <x-text type="title" style="bold">Reportar info de ${pet.name}</x-text>
     <form class="report-pet__form">
       <label class="report-pet__label">
@@ -43,12 +58,39 @@ class WelcomePage extends HTMLElement {
       </label>
       <label class="report-pet__label">
         <span>¿DÓNDE LO VISTE?</span>
-        <textarea class="report-pet__input" ></textarea>
+        <textarea class="report-pet__input" name="report"></textarea>
       </label>
+      <x-button type="primary">Enviar reporte</x-button>
     </form>
     `;
     div.className = "report-pet";
     this.appendChild(div);
+    const form: any = this.querySelector(".report-pet__form");
+    div.querySelector(".exit").addEventListener("click", () => {
+      div.remove();
+    });
+    form
+      .querySelector("x-button")
+      .addEventListener("buttonClicked", async (e: any) => {
+        const report = {
+          petId: pet.id,
+          petName: pet.name,
+          name: form.name.value,
+          tel: form.tel.value,
+          report: form.report.value,
+        };
+        try {
+          const reportSended = await state.sendReport(report);
+          if (reportSended) {
+            window.alert(
+              `${report.name}, muchas gracias por reportar información de ${report.petName}. Se le envió un mail a quien lo busca para que sepa lo que nos contaste.`
+            );
+            div.remove();
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      });
   }
   render(pets?) {
     if (!pets) {
@@ -67,7 +109,7 @@ class WelcomePage extends HTMLElement {
     if (pets) {
       const petsString = pets
         .map((pet) => {
-          return `<x-pet-card img=${pet.imgURL} petId=${pet.objectID}>${pet.name}</x-pet-card>`;
+          return `<x-pet-card img=${pet.imgURL} petId=${pet.objectID} petName="${pet.name}">${pet.name}</x-pet-card>`;
         })
         .join("");
       this.innerHTML = `
