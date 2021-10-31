@@ -1,6 +1,4 @@
-import { parse } from "dotenv";
-
-const BASE_URL_API = "http://localhost:8080";
+const BASE_URL_API = "https://pets-app-mr.herokuapp.com/";
 
 export const state = {
   data: {
