@@ -2,7 +2,7 @@ import { Router } from "@vaadin/router";
 import { state } from "../state";
 import { mapping } from "../utils/mapbox";
 import { dropzonedImg } from "../utils/dropzone";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 const missingImg = require("url:../assets/missingimg.png");
 
 class PetData extends HTMLElement {
@@ -69,7 +69,7 @@ class PetData extends HTMLElement {
           imgURL: petDataForm.imgURL.getAttribute("src"),
           _geoloc: petDataForm.geoloc.value,
         });
-        swal({ icon: "success" });
+        Swal.fire({ icon: "success" });
       }
       if (type == "Reportar") {
         //Crea la mascota
@@ -78,7 +78,7 @@ class PetData extends HTMLElement {
           imgURL: petDataForm.imgURL.getAttribute("src"),
           _geoloc: petDataForm.geoloc.value,
         });
-        swal({ icon: "success" });
+        Swal.fire({ icon: "success" });
       }
       console.log();
     });
@@ -90,7 +90,7 @@ class PetData extends HTMLElement {
     this.querySelector(".finded").addEventListener("buttonClicked", (e) => {
       //enviar al servidor que se encontró a la
       state.findedPet(pet.id);
-      swal({ icon: "success", title: "Nos alegra mucho!" });
+      Swal.fire({ icon: "success", title: "Nos alegra mucho!" });
       const petDataForm: any = this.querySelector(".pet-data");
       petDataForm.reset();
     });

@@ -1,6 +1,6 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 
 class MyData extends HTMLElement {
   connectedCallback() {
@@ -38,7 +38,7 @@ class MyData extends HTMLElement {
         const data = new FormData(loginForm);
         const value = Object.fromEntries(data.entries());
         const update = await state.updateUser(value);
-        swal({
+        Swal.fire({
           icon: "success",
         });
       });
@@ -56,7 +56,7 @@ class MyData extends HTMLElement {
               password,
             });
             await state.updateUser({ name });
-            swal({
+            Swal.fire({
               icon: "success",
               title: "Bienvenidx!",
             });
@@ -64,7 +64,7 @@ class MyData extends HTMLElement {
             console.error(err);
           }
         } else {
-          swal("Verificar las contraseñas. No son iguales.");
+          Swal.fire("Verificar las contraseñas. No son iguales.");
         }
       });
     }

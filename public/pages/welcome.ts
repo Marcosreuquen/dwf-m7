@@ -1,6 +1,6 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 
 class WelcomePage extends HTMLElement {
   connectedCallback() {
@@ -86,7 +86,7 @@ class WelcomePage extends HTMLElement {
         try {
           const reportSended = await state.sendReport(report);
           if (reportSended) {
-            swal({
+            Swal.fire({
               icon: "success",
               text: `${report.name}, muchas gracias por reportar información de ${report.petName}. Se le envió un mail a quien lo busca para que sepa lo que nos contaste.`,
             });

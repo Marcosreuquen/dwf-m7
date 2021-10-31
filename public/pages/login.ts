@@ -1,6 +1,6 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 class Login extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -62,7 +62,7 @@ class Login extends HTMLElement {
         e.preventDefault();
         const userData = { email, password: form.password.value };
         await state.createOrFindUser(userData).then((res) => {
-          swal({
+          Swal.fire({
             icon: "success",
             title: "Bienvenidx!",
           });

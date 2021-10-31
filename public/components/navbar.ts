@@ -1,7 +1,6 @@
 const huella = require("url:../assets/huella.png");
 const burger = require("url:../assets/burger.png");
 import { state } from "../state";
-import swal from "sweetalert";
 class NavBar extends HTMLElement {
   connectedCallback() {
     this.render();

@@ -1081,13 +1081,6 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/sweetalert@^2.0.4":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@types/sweetalert/-/sweetalert-2.0.4.tgz#8a7c2c1f4efa0ed0ef48e72e6ead550d672347fa"
-  integrity sha512-BSO9bAIUh/h1mfQgyMLniwTjysCV5Ktmy5JULmantIJBuZtHilIWNuM+O6myboyyHNv9uASXTc7Unh9GGp4srg==
-  dependencies:
-    sweetalert "*"
-
 "@vaadin/router@^1.7.4":
   version "1.7.4"
   resolved "https://registry.yarnpkg.com/@vaadin/router/-/router-1.7.4.tgz#76d78d0091275cadf1ac18f0e8b75bf0fd6fe253"
@@ -5407,11 +5400,6 @@ process@^0.11.10:
   resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
   integrity sha1-czIwDoQBYb2j5podHZGn1LwW8YI=
 
-promise-polyfill@^6.0.2:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/promise-polyfill/-/promise-polyfill-6.1.0.tgz#dfa96943ea9c121fca4de9b5868cb39d3472e057"
-  integrity sha1-36lpQ+qcEh/KTem1hoyznTRy4Fc=
-
 protocol-buffers-schema@^3.3.1:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/protocol-buffers-schema/-/protocol-buffers-schema-3.6.0.tgz#77bc75a48b2ff142c1ad5b5b90c94cd0fa2efd03"
@@ -6294,13 +6282,10 @@ svgo@^2.3.0, svgo@^2.6.1:
     nanocolors "^0.1.12"
     stable "^0.1.8"
 
-sweetalert@*, sweetalert@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/sweetalert/-/sweetalert-2.1.2.tgz#010baaa80d0dbdc86f96bfcaa96b490728594b79"
-  integrity sha512-iWx7X4anRBNDa/a+AdTmvAzQtkN1+s4j/JJRWlHpYE8Qimkohs8/XnFcWeYHH2lMA8LRCa5tj2d244If3S/hzA==
-  dependencies:
-    es6-object-assign "^1.1.0"
-    promise-polyfill "^6.0.2"
+sweetalert2@^11.1.9:
+  version "11.1.9"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.1.9.tgz#f3948198119fab2de7014ccd7840cc4a6d671185"
+  integrity sha512-ox+BjtAbO8mJrbQH9TsNwMwLeTfV+ve33CVz/kKn5D/DhRiSqnw2rWL4HuBlh9Z4yqYlTD5viR5Z2K5D3avM7Q==
 
 symbol-tree@^3.2.2:
   version "3.2.4"
