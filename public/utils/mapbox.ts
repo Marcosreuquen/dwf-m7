@@ -1,12 +1,14 @@
 //import mapbox, mapboxtoken, mapboxgl
 import * as MapboxClient from "mapbox";
 import * as mapboxgl from "../../node_modules/mapbox-gl/dist/mapbox-gl.js";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 // console.log(mapboxgl, MapboxClient);
 
 const TOKEN = process.env.MAPBOX_TOKEN;
 
 export async function mapping() {
+  const form: any = document.querySelector(".pet-data");
   const mapboxClient = new MapboxClient(TOKEN);
 
   function initMap() {
@@ -18,7 +20,6 @@ export async function mapping() {
   }
 
   function initSearchForm(callback) {
-    const form = document.querySelector(".pet-data");
     form.addEventListener("change", (e) => {
       e.preventDefault();
       mapboxClient.geocodeForward(
@@ -38,7 +39,6 @@ export async function mapping() {
 
   window.map = initMap();
   initSearchForm(async function (results) {
-    const form = document.querySelector(".pet-data");
     // console.log(results);
     const firstResult = results[0];
     const marker = new mapboxgl.Marker({ color: "#222", draggable: true })
@@ -46,6 +46,7 @@ export async function mapping() {
       .addTo(map);
     map.setCenter(firstResult.geometry.coordinates);
     map.setZoom(14);
+    form.geoloc.value = firstResult.geometry.coordinates;
 
     marker.on("dragend", () => {
       const lngLat = marker.getLngLat();

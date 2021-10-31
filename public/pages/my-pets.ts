@@ -3,8 +3,8 @@ import { state } from "../state";
 import * as map from "lodash/map";
 class MyPets extends HTMLElement {
   async connectedCallback() {
-    const myPets = await state.getMyPets();
-    myPets ? this.render(myPets.myPets) : this.render();
+    const { myPets } = await state.getMyPets();
+    myPets.length > 0 ? this.render(myPets) : this.render();
   }
   render(pets?) {
     this.innerHTML = pets

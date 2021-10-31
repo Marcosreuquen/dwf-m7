@@ -171,12 +171,6 @@ export const state = {
     var [latitude, longitude] = _geoloc.split(",");
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
-    console.log({
-      name,
-      img: imgURL,
-      lat,
-      lng,
-    });
     const petEdited = await (
       await fetch(BASE_URL_API + `/me/pets`, {
         method: "POST",

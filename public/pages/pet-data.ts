@@ -1,7 +1,7 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
 import { mapping } from "../utils/mapbox";
-import { Dropzone } from "dropzone";
+import { dropzonedImg } from "../utils/dropzone";
 import swal from "sweetalert";
 const missingImg = require("url:../assets/missingimg.png");
 
@@ -21,22 +21,22 @@ class PetData extends HTMLElement {
     this.innerHTML = `
       <div>
       <x-navbar></x-navbar>
-      <form class="pet-data">
+      <form class="pet-data card">
         <x-text type="title" style="bold">${type} mascota perdida</x-text>
-        <label>
+        <label class="label">
         <span>NOMBRE</span>
-        <input type="text" name="name">
+        <input type="text" name="name" class="is-success">
         </label>
-        <label id="img">
+        <label class="label" id="img">
           <img class="imgUrlPet" name="imgURL" src=${missingImg}>
           <x-button type="secondary" id="buttonImg">agregar/modificar foto</x-button>
         </label>
-        <label>
+        <label class="label">
           <span>UBICACION</span>
+          <x-text type="body">BUSCÁ UN PUNTO DE REFERENCIA PARA REPORTAR A TU MASCOTA. PUEDE SER UNA DIRECCIÓN, UN BARRIO O UNA CIUDAD</x-text>
           <div id="map" style="width: 335px; height: 335px"></div>
           <input type="text" name="geoloc" class="search-geoloc">
         </label>
-        <x-text type="body">BUSCÁ UN PUNTO DE REFERENCIA PARA REPORTAR A TU MASCOTA. PUEDE SER UNA DIRECCIÓN, UN BARRIO O UNA CIUDAD</x-text>
         <x-button class="submit" type="primary">${type}</x-button>
         <x-button type=${pet ? "cancel" : "secondary"} class=${
       pet ? "cancel" : "finded"
@@ -45,37 +45,24 @@ class PetData extends HTMLElement {
     </div>
     `;
     if (pet) {
+      //inserta los datos de la mascota en el formulario
       const petDataForm: any = this.querySelector(".pet-data");
       petDataForm.name.value = pet.name;
       petDataForm.querySelector(".imgUrlPet").src = pet.imgURL;
       petDataForm.geoloc.value = `${pet._geoloc.lat},${pet._geoloc.lat}`;
     }
     const buttonImg = this.querySelector("#buttonImg");
-    mapping();
-
     const pic = this.querySelector(".imgUrlPet");
-    // la url la exige la librería
-    const myDropzone = new Dropzone(pic, {
-      url: "/falsa",
-      autoProcessQueue: false,
-      // previewTemplate: document.querySelector("#img").innerHTML,
-      clickable: true,
-      clickeableElements: buttonImg,
-      thumbnail: function (file, dataUrl) {
-        // Display the image in your file.previewElement
-        console.log(file, dataUrl);
-        pic.setAttribute("src", dataUrl);
-      },
-      init: function () {
-        buttonImg.addEventListener("buttonClicked", (e) => {
-          this.processQueue();
-        });
-      },
-    });
+
+    //inicializa el mapa
+    mapping();
+    //inicializa dropzone
+    dropzonedImg(pic, buttonImg);
 
     this.querySelector(".submit").addEventListener("buttonClicked", (e) => {
       const petDataForm: any = this.querySelector(".pet-data");
       if (type == "Editar") {
+        //Edita la mascota
         state.editPet({
           id: pet.id,
           name: petDataForm.name.value,
@@ -85,6 +72,7 @@ class PetData extends HTMLElement {
         swal({ icon: "success" });
       }
       if (type == "Reportar") {
+        //Crea la mascota
         state.createPet({
           name: petDataForm.name.value,
           imgURL: petDataForm.imgURL.getAttribute("src"),

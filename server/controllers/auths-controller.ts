@@ -10,15 +10,15 @@ export const AuthController = {
       console.error(err);
     }
   },
-  async findOrCreate(user_id, data: { email: string; password: string }) {
+  async findOrCreate(userId, data: { email: string; password: string }) {
     const { email, password } = data;
     try {
       const [auth, authCreated] = await Auth.findOrCreate({
-        where: { user_id: user_id },
+        where: { userId },
         defaults: {
-          email: email,
-          password: password,
-          userId: user_id,
+          email,
+          password,
+          userId,
         },
       });
       return [auth, authCreated];

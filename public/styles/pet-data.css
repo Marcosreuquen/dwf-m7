@@ -5,6 +5,7 @@
   justify-content: space-around;
   align-items: center;
   height: 100%;
+  gap: 10px;
 }
 
 .pet-data label {
@@ -13,6 +14,7 @@
   gap: 10px;
   width: 100%;
   max-width: 335px;
+  padding: 10px;
 }
 .pet-data input {
   height: 50px;
@@ -21,4 +23,8 @@
 
 .pet-data x-text div {
   max-width: 335px;
+}
+.mapboxgl-ctrl {
+  display: none;
+  overflow: hidden;
 }

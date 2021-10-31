@@ -31,19 +31,6 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json({ limit: "100mb" }));
 app.use(cors());
 
-//---------------------------------------API TESTER
-app.get("/test", async (req, res) => {
-  //endpoint de test
-  //  const allUsers = await UserController.getAll();
-  const sendedEmail = await sendEmail(
-    "marcosreuquendiaz@gmail.com",
-    123456,
-    "pet.name",
-    "created.report"
-  );
-  res.send({ sendedEmail });
-});
-
 //---------------------------------------AUTH
 app.get("/users/exist", checkBody, async (req, res) => {
   //crear un User y un Auth; y devuelve el User.
@@ -81,7 +68,7 @@ app.post("/auth/token", checkBody, getSHA256ofSTRING, async (req, res) => {
   //Este endpoint chequea en la tabla auth que esos datos concuerden con los guardados y genera un token con un objeto que tenga solo el id del user.
   const { email } = req.body;
   const auth = await AuthController.findOne(email, req._SHA256Password);
-  const token = createToken(auth.get("user_id"));
+  const token = createToken(auth.get("userId"));
 
   if (auth) {
     res.send({ token });

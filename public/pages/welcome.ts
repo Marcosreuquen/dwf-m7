@@ -46,7 +46,7 @@ class WelcomePage extends HTMLElement {
     console.log(pet);
     const div = document.createElement("div");
     div.innerHTML = `
-    <div class="exit">X</div>
+    <div class="exit button is-danger">X</div>
     <x-text type="title" style="bold">Reportar info de ${pet.name}</x-text>
     <form class="report-pet__form">
       <label class="report-pet__label">
@@ -66,7 +66,8 @@ class WelcomePage extends HTMLElement {
     `;
     div.className = "report-pet";
     div.classList.add("report-pet");
-    div.classList.add("has-background-primary-light");
+    div.classList.add("has-background-grey-darker");
+    div.classList.add("has-text-light");
     this.appendChild(div);
     const form: any = this.querySelector(".report-pet__form");
     div.querySelector(".exit").addEventListener("click", () => {
