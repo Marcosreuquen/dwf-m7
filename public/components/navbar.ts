@@ -1,42 +1,54 @@
 const huella = require("url:../assets/huella.png");
 const burger = require("url:../assets/burger.png");
 import { state } from "../state";
+import swal from "sweetalert";
 class NavBar extends HTMLElement {
   connectedCallback() {
     this.render();
   }
   addListeners() {
-    const menu: any = this.querySelector(".navbar__menu");
-    this.querySelector(".navbar__burger").addEventListener("click", (e) => {
-      menu.style.display = "inherit";
-    });
-    menu.addEventListener("click", (e) => {
-      menu.style.display = "none";
+    const burger = this.querySelector(".navbar-burger");
+    const menu = this.querySelector("#menubar");
+    burger.addEventListener("click", (e) => {
+      menu.classList.toggle("is-active");
     });
   }
   render() {
     const cs = state.getState();
     this.innerHTML = `
-    <div class="navbar">
-      <a href="/welcome">
-        <img class="navbar__logo" src="${huella}">
-      </a>
-        <img class="navbar__burger" src="${burger}">
-      <div class="navbar__menu">
-        <div class="menu__box">
-          <ul class="menu__links">
-            <a class="menu__link-selection" href="/my-data">Mis datos</a>
-            <a class="menu__link-selection" href="/my-pets">Mis mascotas reportadas</a>
-            <a class="menu__link-selection" href="/pet-data">Reportar mascota</a>
-          </ul>
-          <footer class="menu__session-options">
-            <label class="menu__email">${
-              cs.user?.email ? cs.user.email : ""
-            }</label>
-            <a class="menu__logout" href="/login">${
-              cs.user?.token ? "CERRAR SESION" : "INICIAR SESION"
-            }</a>
-          </footer>
+    <div class="navbar has-background-white-ter" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a href="/welcome" class="navbar-item">
+          <img class="navbar__logo navbar-brand" src="${huella}">
+        </a>
+        <a role="button" class="navbar-burger is-pulled-right	" aria-label="menu" aria-expanded="false" data-target="menubar">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div class="navbar-menu has-background-white-ter" id="menubar">
+      <div class="navbar-start">
+      <div class="navbar-item">
+      <a href="/my-data" class="navbar-item">Mis datos</a>
+      </div>
+      </div>
+      <div class="navbar-start">
+        <div class="navbar-item">
+        <a href="/my-pets" class="navbar-item">Mis mascotas reportadas</a>
+        </div>
+      </div>
+      <div class="navbar-start">
+        <div class="navbar-item">
+          <a href="/pet-data" class="navbar-item">Reportar mascota</a>
+          </div>
+      </div>
+      <div class="navbar-end navbar-item">
+        <span>${cs.user?.email ? cs.user.email : ""}</span>
+        <hr class="navbar-divider">
+        <a href="/login" class="navbar-item button is-primary">${
+          cs.user?.token ? "CERRAR SESION" : "INICIAR SESION"
+        }</a>
         </div>
       </div>
     </div>

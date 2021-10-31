@@ -23,7 +23,6 @@ export async function checkId(req, res, next) {
 
 export async function middlewareToken(req, res, next) {
   //check if the token received was signed with Secret key
-  console.log(req.headers);
   bearerToken(req, async (err, token) => {
     if (token) {
       try {

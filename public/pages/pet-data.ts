@@ -2,6 +2,8 @@ import { Router } from "@vaadin/router";
 import { state } from "../state";
 import { mapping } from "../utils/mapbox";
 import { Dropzone } from "dropzone";
+import swal from "sweetalert";
+const missingImg = require("url:../assets/missingimg.png");
 
 class PetData extends HTMLElement {
   async connectedCallback() {
@@ -13,7 +15,7 @@ class PetData extends HTMLElement {
       this.render();
     }
   }
-  render(pet?) {
+  async render(pet?) {
     const type = pet ? "Editar" : "Reportar";
 
     this.innerHTML = `
@@ -23,10 +25,10 @@ class PetData extends HTMLElement {
         <x-text type="title" style="bold">${type} mascota perdida</x-text>
         <label>
         <span>NOMBRE</span>
-        <input type="text" name="name" placeholder=${pet?.name}>
+        <input type="text" name="name">
         </label>
         <label id="img">
-          <img class="imgUrlPet" name="imgURL">
+          <img class="imgUrlPet" name="imgURL" src=${missingImg}>
           <x-button type="secondary" id="buttonImg">agregar/modificar foto</x-button>
         </label>
         <label>
@@ -50,6 +52,7 @@ class PetData extends HTMLElement {
     }
     const buttonImg = this.querySelector("#buttonImg");
     mapping();
+
     const pic = this.querySelector(".imgUrlPet");
     // la url la exige la librería
     const myDropzone = new Dropzone(pic, {
@@ -60,11 +63,11 @@ class PetData extends HTMLElement {
       clickeableElements: buttonImg,
       thumbnail: function (file, dataUrl) {
         // Display the image in your file.previewElement
+        console.log(file, dataUrl);
         pic.setAttribute("src", dataUrl);
       },
       init: function () {
         buttonImg.addEventListener("buttonClicked", (e) => {
-          console.log("dropzone iniciando", this, e);
           this.processQueue();
         });
       },
@@ -76,25 +79,32 @@ class PetData extends HTMLElement {
         state.editPet({
           id: pet.id,
           name: petDataForm.name.value,
-          imgURL: petDataForm.imgURL.src,
+          imgURL: petDataForm.imgURL.getAttribute("src"),
           _geoloc: petDataForm.geoloc.value,
         });
+        swal({ icon: "success" });
       }
       if (type == "Reportar") {
         state.createPet({
           name: petDataForm.name.value,
-          imgURL: petDataForm.imgURL.src,
+          imgURL: petDataForm.imgURL.getAttribute("src"),
           _geoloc: petDataForm.geoloc.value,
         });
+        swal({ icon: "success" });
       }
       console.log();
     });
     this.querySelector(".cancel").addEventListener("buttonClicked", (e) => {
       //limpiar formulario
+      const petDataForm: any = this.querySelector(".pet-data");
+      petDataForm.reset();
     });
     this.querySelector(".finded").addEventListener("buttonClicked", (e) => {
       //enviar al servidor que se encontró a la
       state.findedPet(pet.id);
+      swal({ icon: "success", title: "Nos alegra mucho!" });
+      const petDataForm: any = this.querySelector(".pet-data");
+      petDataForm.reset();
     });
   }
 }

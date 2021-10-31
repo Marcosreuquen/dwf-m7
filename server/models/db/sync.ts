@@ -1,6 +1,6 @@
 import { sequelize } from "./connection";
 
-const typeSync = { alter: true };
+const typeSync = { alter: true }; //alter/force
 
 sequelize
   .sync(typeSync)

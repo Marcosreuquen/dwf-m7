@@ -41,7 +41,7 @@ app.get("/test", async (req, res) => {
     "pet.name",
     "created.report"
   );
-  res.json(sendedEmail);
+  res.send({ sendedEmail });
 });
 
 //---------------------------------------AUTH
@@ -53,15 +53,15 @@ app.get("/users/exist", checkBody, async (req, res) => {
 
     const exist = await UserController.userExist(email);
 
-    res.status(201).json({ email, exist });
+    res.send({ email, exist });
   } catch (err) {
-    res.send(err);
+    res.send({ err });
   }
 });
 
 app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
   //crear un User y un Auth; y devuelve el User.
-  //recibe en el body: {email, password, lat, lng }
+  //recibe en el body: {email, password }
   try {
     const data = req.body;
 
@@ -70,8 +70,7 @@ app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
       user.get("id"),
       { email: data.email, password: req._SHA256Password }
     );
-    console.log(user, created);
-    res.status(201).json({ user, created });
+    res.send({ user, created });
   } catch (err) {
     res.send(err);
   }
@@ -80,48 +79,47 @@ app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
 app.post("/auth/token", checkBody, getSHA256ofSTRING, async (req, res) => {
   //SignIn - POST /auth/token (pedís token) Recibe: { email:string, password:string }
   //Este endpoint chequea en la tabla auth que esos datos concuerden con los guardados y genera un token con un objeto que tenga solo el id del user.
-  console.log(req.body);
   const { email } = req.body;
   const auth = await AuthController.findOne(email, req._SHA256Password);
   const token = createToken(auth.get("user_id"));
 
   if (auth) {
-    res.json({ token });
+    res.send({ token });
   } else {
-    res.status(400).json({ error: "Email or password incorrect." });
+    res.send({ error: "Email or password incorrect." });
   }
 });
 
 app.get("/me", checkBody, middlewareToken, async (req, res) => {
   //Devuelve el usuario correspondiente a un token
-  const id = req._user.id;
+  const { id } = req._user;
   try {
-    const user = await UserController.findOne(req._user.id);
-    res.status(201).json(user);
+    const user = await UserController.findOne(id);
+    res.send({ user });
   } catch (err) {
-    res.status(401).json(err);
+    res.send({ err });
   }
 });
 
 app.put("/me", checkBody, middlewareToken, async (req, res) => {
   //Devuelve el usuario correspondiente a un token
-  const id = req._user.id;
+  const { id } = req._user;
   try {
     const user = await UserController.update(id, req.body);
-    res.status(201).json(user);
+    res.send({ user });
   } catch (err) {
-    res.status(401).json(err);
+    res.send({ err });
   }
 });
 
 app.get("/me/pets", checkBody, middlewareToken, async (req, res) => {
   //Devuelve el usuario correspondiente a un token
-  const id = req._user.id;
+  const { id } = req._user;
   try {
     const myPets = await UserController.myPets(id);
-    res.status(201).json(myPets);
+    res.send({ myPets });
   } catch (err) {
-    res.status(401).json(err);
+    res.status(400).send({ err });
   }
 });
 
@@ -140,41 +138,41 @@ app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
     const algoliaRes = await pets_index_algolia.saveObject({
       objectID: petCreated.get("id"),
       name: petCreated.get("name"),
-      imgURL: petCreated.get("imgUrl"),
+      imgURL,
       _geoloc: {
         lat: petCreated.get("lat"),
         lng: petCreated.get("lng"),
       },
     });
-    res.status(201).json(petCreated, algoliaRes);
+    res.send({ petCreated, algoliaRes });
   } catch (err) {
-    res.json(err);
+    res.send({ err });
   }
 });
 
-app.put("/me/pets/:petId", checkBody, middlewareToken, async (req, res) => {
+app.put("/me/pets", checkBody, middlewareToken, async (req, res) => {
   //Verifica el token, y modifica una mascota en db, algolia y cloudinary.
   const { name, img, lat, lng } = req.body;
-  const { id } = req.query;
+  const { petId } = req.query;
   const imgURL = await uploadImgToCloudinary(img);
 
   try {
     const petUpdated = await PetsController.updatePet(
       { name, lat, lng, imgURL },
-      id
+      petId
     );
     const algoliaRes = await pets_index_algolia.partialUpdateObject({
       objectID: petUpdated.get("id"),
       name: petUpdated.get("name"),
-      imgURL: petUpdated.get("imgUrl"),
+      imgURL,
       _geoloc: {
         lat: petUpdated.get("lat"),
         lng: petUpdated.get("lng"),
       },
     });
-    res.status(201).json(petUpdated, algoliaRes);
+    res.send({ petUpdated, algoliaRes });
   } catch (err) {
-    res.json(err);
+    res.send({ err });
   }
 });
 
@@ -186,7 +184,7 @@ app.get("/pets/around", async (req, res) => {
     const { hits } = await pets_index_algolia.search("", {
       aroundLatLng: `${lat},${lng}`,
     });
-    res.json(hits);
+    res.send(hits);
   } catch (err) {
     res.send(err);
   }
@@ -196,28 +194,24 @@ app.get("/pets", async (req, res) => {
   const { petId } = req.query;
   try {
     const pet = await PetsController.findOne(petId);
-    res.status(200).json(pet);
+    res.send(pet);
   } catch (err) {
-    res.json(err);
+    res.send(err);
   }
 });
 
-app.delete("/me/pets/:petId", middlewareToken, async (req, res) => {
+app.delete("/me/pets", middlewareToken, async (req, res) => {
   //DELETE/me/pets -> Verifica el token y marca una mascota como encontrada (eliminada).
   const { petId } = req.query;
   try {
     const deletedPet = await PetsController.deletePet(petId);
     if (deletedPet) {
-      res
-        .status(200)
-        .json({ message: `Pet ${petId} has been deleted succesfully` });
+      res.send({ message: `Pet ${petId} has been deleted succesfully` });
     } else {
-      res
-        .status(404)
-        .json({ message: `Has been an error deleting pet: ${petId}` });
+      res.send({ message: `Has been an error deleting pet: ${petId}` });
     }
   } catch (err) {
-    res.send(err);
+    res.send({ err });
   }
 });
 
@@ -226,34 +220,34 @@ app.get("/me/reports", middlewareToken, async (req, res) => {
   const id = req._user.id;
   try {
     const reports = await UserController.myReports(id);
-    res.status(200).json(reports);
+    res.send({ reports });
   } catch (err) {
-    res.status(401).json(err);
+    res.send({ err });
   }
 });
 
 app.post("/pets/report", checkBody, middlewareToken, async (req, res) => {
   //POST/pets/report -> Verifica el token y reporta una mascota. Recbe Authorization bearer token + body:{name,tel,report}. Se requiere sendgrid.
-  console.log("Llega al endpoint");
   const { petId } = req.query;
   const userId = req._user.id;
   const data = req.body;
   try {
-    const created = (
-      await ReportsController.sendReport(petId, userId, data)
-    ).get();
-    const user = created.users;
-    const pet = created.pets;
+    const [created, pet] = await await ReportsController.sendReport(
+      petId,
+      userId,
+      data
+    );
     const sendedEmail = await sendEmail(
-      user.email,
-      created.tel,
-      pet.name,
-      created.report
+      pet.getDataValue("user").email,
+      created.getDataValue("tel"),
+      pet.getDataValue("name"),
+      created.getDataValue("report")
     );
 
-    res.json(created, sendedEmail);
+    res.send({ created, sendedEmail });
   } catch (err) {
-    res.json(err);
+    res.send({ err });
+    console.log(err);
   }
 });
 //---------------------------------------STATICS

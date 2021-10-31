@@ -1,6 +1,6 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-
+import swal from "sweetalert";
 class Login extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -23,15 +23,19 @@ class Login extends HTMLElement {
     form
       .querySelector("x-button")
       .addEventListener("buttonClicked", async (e) => {
-        console.log(e, form.email.value);
-        const { exist } = await state.checkMail(form.email.value);
-        if (exist) {
-          this.renderPass(form.email.value);
-        } else {
-          (() => {
-            state.saveMail(form.email.value);
+        const email = form.email.value;
+        const { exist } = await state.checkMail(email);
+        try {
+          if (exist == true) {
+            this.renderPass(email);
+          }
+          if (exist == false) {
+            console.log("exist is:", exist, Router);
+            state.saveMail(email);
             Router.go("/my-data");
-          })();
+          }
+        } catch (error) {
+          console.error(error);
         }
       });
   }
@@ -58,6 +62,10 @@ class Login extends HTMLElement {
         e.preventDefault();
         const userData = { email, password: form.password.value };
         await state.createOrFindUser(userData).then((res) => {
+          swal({
+            icon: "success",
+            title: "Bienvenidx!",
+          });
           Router.go("/my-data");
         });
       });

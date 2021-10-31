@@ -1,3 +1,5 @@
+import { parse } from "dotenv";
+
 const BASE_URL_API = "http://localhost:8080";
 
 export const state = {
@@ -46,7 +48,7 @@ export const state = {
     cs.user = user;
     cs.user.created = created;
     this.setState(cs);
-    this.getToken(userData.email, userData.password);
+    return await this.getToken(userData.email, userData.password);
   },
   async getToken(email, password) {
     // "/auth/token"
@@ -61,6 +63,7 @@ export const state = {
       })
     ).json();
     cs.user.token = token.token;
+    this.setState(cs);
     return true;
   },
   async updateUser(data) {
@@ -88,7 +91,7 @@ export const state = {
   async sendReport(report) {
     const cs = this.getState();
     return await (
-      await fetch(BASE_URL_API + `/pets/report?petId=${report.petId}`, {
+      await fetch(`${BASE_URL_API}/pets/report?petId=${report.petId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,7 +122,7 @@ export const state = {
         },
       })
     ).json();
-    cs.myPets = myPets;
+    cs.myPets = myPets.myPets;
     this.setState(cs);
     return myPets;
   },
@@ -140,7 +143,67 @@ export const state = {
     cs.petData = petData;
     this.setState(cs);
   },
-  async editPet({ id, name, imgURL, _geoloc }) {},
-  async createPet({ name, imgURL, _geoloc }) {},
-  async findedPet(id) {},
+  async editPet({ id, name, imgURL, _geoloc }) {
+    const cs = this.getState();
+    const [latitude, longitude] = _geoloc.split(",");
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    const petEdited = await (
+      await fetch(BASE_URL_API + `/me/pets?petId=${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `bearer ${cs.user.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          img: imgURL,
+          lat,
+          lng,
+        }),
+      })
+    ).json();
+    return petEdited;
+  },
+  async createPet({ name, imgURL, _geoloc }) {
+    const cs = this.getState();
+    var [latitude, longitude] = _geoloc.split(",");
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    console.log({
+      name,
+      img: imgURL,
+      lat,
+      lng,
+    });
+    const petEdited = await (
+      await fetch(BASE_URL_API + `/me/pets`, {
+        method: "POST",
+        headers: {
+          Authorization: `bearer ${cs.user.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          img: imgURL,
+          lat,
+          lng,
+        }),
+      })
+    ).json();
+    return petEdited;
+  },
+  async findedPet(id) {
+    const cs = this.getState();
+    const petEdited = await (
+      await fetch(BASE_URL_API + `/me/pets?petId=${id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `bearer ${cs.user.token}`,
+        },
+      })
+    ).json();
+    return petEdited;
+  },
 };

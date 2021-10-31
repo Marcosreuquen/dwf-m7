@@ -18,7 +18,7 @@ export const AuthController = {
         defaults: {
           email: email,
           password: password,
-          user_id: user_id,
+          userId: user_id,
         },
       });
       return [auth, authCreated];

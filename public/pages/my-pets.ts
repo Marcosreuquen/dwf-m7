@@ -1,19 +1,10 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-
+import * as map from "lodash/map";
 class MyPets extends HTMLElement {
-  connectedCallback() {
-    state
-      .getMyPets()
-      .then((r) => {
-        r.json((myPets) => {
-          console.log(myPets);
-          this.render(myPets);
-        });
-      })
-      .catch(() => {
-        this.render();
-      });
+  async connectedCallback() {
+    const myPets = await state.getMyPets();
+    myPets ? this.render(myPets.myPets) : this.render();
   }
   render(pets?) {
     this.innerHTML = pets
@@ -21,13 +12,13 @@ class MyPets extends HTMLElement {
       <div>
       <x-navbar></x-navbar>
       <x-text type="title" style="bold">Mis mascotas reportadas</x-text>
-      <div class="mypets">
+      <div class="pets-container">
         ${
           !pets
             ? `<x-text type="body">AUN NO REPORTASTE MASCOTAS PERDIDAS</x-text>`
-            : pets.map((pet) => {
+            : map(pets, (pet) => {
                 return `<x-pet-card img=${pet.imgURL} petId=${pet.objectID}>${pet.name}</x-pet-card>`;
-              })
+              }).join("")
         }
       </div>
       </div>

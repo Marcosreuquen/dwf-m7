@@ -6,8 +6,6 @@ User.init(
   {
     name: DataTypes.STRING,
     email: DataTypes.STRING,
-    lat: DataTypes.FLOAT,
-    lng: DataTypes.FLOAT,
     state: DataTypes.BOOLEAN,
   },
   { sequelize, modelName: "user" }

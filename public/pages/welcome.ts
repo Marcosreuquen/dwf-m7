@@ -1,5 +1,6 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
+import swal from "sweetalert";
 
 class WelcomePage extends HTMLElement {
   connectedCallback() {
@@ -50,20 +51,22 @@ class WelcomePage extends HTMLElement {
     <form class="report-pet__form">
       <label class="report-pet__label">
         <span>TU NOMBRE</span>
-        <input  class="report-pet__input" type="text" name="name">
+        <input  class="report-pet__input input is-large" type="text" name="name">
       </label>
       <label class="report-pet__label">
         <span>TU TELEFONO</span>
-        <input  class="report-pet__input" type="phone" name="tel">
+        <input  class="report-pet__input input is-large" type="phone" name="tel">
       </label>
       <label class="report-pet__label">
         <span>¿DÓNDE LO VISTE?</span>
-        <textarea class="report-pet__input" name="report"></textarea>
+        <textarea class="report-pet__input textarea" name="report"></textarea>
       </label>
       <x-button type="primary">Enviar reporte</x-button>
     </form>
     `;
     div.className = "report-pet";
+    div.classList.add("report-pet");
+    div.classList.add("has-background-primary-light");
     this.appendChild(div);
     const form: any = this.querySelector(".report-pet__form");
     div.querySelector(".exit").addEventListener("click", () => {
@@ -82,9 +85,10 @@ class WelcomePage extends HTMLElement {
         try {
           const reportSended = await state.sendReport(report);
           if (reportSended) {
-            window.alert(
-              `${report.name}, muchas gracias por reportar información de ${report.petName}. Se le envió un mail a quien lo busca para que sepa lo que nos contaste.`
-            );
+            swal({
+              icon: "success",
+              text: `${report.name}, muchas gracias por reportar información de ${report.petName}. Se le envió un mail a quien lo busca para que sepa lo que nos contaste.`,
+            });
             div.remove();
           }
         } catch (error) {
@@ -98,7 +102,7 @@ class WelcomePage extends HTMLElement {
       <div>
       <x-navbar></x-navbar>
       <div class="welcome">
-      <x-text type="title" style="bold">Mascotas perdidas cerca tuyo</x-text>
+      <x-text class="title" type="title" style="bold">Mascotas perdidas cerca tuyo</x-text>
       <x-text type="subtitle" style="thin">Para ver las mascotas reportadas cerca tuyo necesitamos permiso para conocer tu ubicación.</x-text>
       <x-button type="primary">Dar mi ubicación</x-button>
       </div>

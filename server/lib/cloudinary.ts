@@ -8,7 +8,7 @@ cloudinary.config({
 
 async function uploadImgToCloudinary(img: string): Promise<string> {
   const dataURL = await cloudinary.uploader.upload(img, {
-    resource_type: "image",
+    resource_type: "auto",
     discard_original_filename: true,
     width: 1000,
   });

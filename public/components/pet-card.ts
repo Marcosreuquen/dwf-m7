@@ -6,29 +6,13 @@ class PetCard extends HTMLElement {
   addStyle() {
     const style = document.createElement("style");
     style.textContent = `
-    .pet-card{
-      display: grid;
-      grid-template-rows: 2fr 1fr;
-      border: 2px solid #333;
-      height: 234px;
-      width: 335px;
-      border-radius: 4px;
-    }
     .pet-card__img{
-
+      width: 335px;
+      height: 335px;
+      object-fit: cover;
     }
-    .pet-card__body{
-      display: flex;
-      flex-direction: row;
-      justify-content: space-around;
-    }
-    .pet-card__links{
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-    }
-    .pet-card__link{
-      cursor: pointer;
+    .pet-card{
+      max-width: 335px;
     }
     `;
     this.appendChild(style);
@@ -38,10 +22,6 @@ class PetCard extends HTMLElement {
       e.preventDefault();
       this.dispatchEvent(new CustomEvent("report-pet", { detail: { id } }));
     });
-    this.querySelector(".info").addEventListener("click", (e) => {
-      e.preventDefault();
-      this.dispatchEvent(new CustomEvent("info-pet", { detail: { id } }));
-    });
   }
   render() {
     const name = this.textContent;
@@ -49,13 +29,12 @@ class PetCard extends HTMLElement {
     const id = this.getAttribute("petId");
 
     this.innerHTML = `
-    <div class="pet-card">
-      <img class="pet-card__img" src=${img}>
-      <div class="pet-card__body">
+    <div class="pet-card card">
+      <img class="pet-card__img card-image" src=${img} crossorigin="anonymous">
+      <div class="pet-card__body card-content">
         <x-text type="subtitle" style="bold">${name}</x-text>
         <ul class="pet-card__links">
-          <a class="pet-card__link report">REPORTAR</a>
-          <a class="pet-card__link info">INFORMACIÓN</a>
+          <a class="pet-card__link report">REPORTAR INFORMACIÓN</a>
         </ul>
         </div>
     </div>

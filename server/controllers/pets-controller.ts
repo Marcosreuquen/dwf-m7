@@ -1,7 +1,7 @@
 import { Pets } from "../models";
 
 export const PetsController = {
-  async newLostPet(data, user_id) {
+  async newLostPet(data, userId) {
     const { name, imgURL, lat, lng } = data;
     const pet = await Pets.create({
       name,
@@ -9,13 +9,13 @@ export const PetsController = {
       lng,
       state: true,
       imgURL,
-      user_id,
+      userId,
     });
     return pet;
   },
-  async updatePet(data, pet_id) {
+  async updatePet(data, petId) {
     const { name, imgURL, lat, lng } = data;
-    const pet = await Pets.findByPk(pet_id);
+    const pet = await Pets.findByPk(petId);
     const petUpdated = await pet.update({
       name,
       lat,
@@ -25,8 +25,8 @@ export const PetsController = {
     });
     return petUpdated;
   },
-  async deletePet(pet_id):Promise<boolean> {
-    const pet = await Pets.findByPk(pet_id);
+  async deletePet(petId): Promise<boolean> {
+    const pet = await Pets.findByPk(petId);
     const petUpdated = await pet.update({
       state: false,
     });
