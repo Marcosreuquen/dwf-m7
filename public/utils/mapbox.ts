@@ -3,8 +3,6 @@ import * as MapboxClient from "mapbox";
 import * as mapboxgl from "../../node_modules/mapbox-gl/dist/mapbox-gl.js";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-// console.log(mapboxgl, MapboxClient);
-
 const TOKEN = process.env.MAPBOX_TOKEN;
 
 export async function mapping() {
@@ -30,16 +28,14 @@ export async function mapping() {
           language: "es",
         },
         function (err, data, res) {
-          // console.log(data);
           if (!err) callback(data.features);
         }
       );
     });
   }
 
-  window.map = initMap();
+  const map = initMap();
   initSearchForm(async function (results) {
-    // console.log(results);
     const firstResult = results[0];
     const marker = new mapboxgl.Marker({ color: "#222", draggable: true })
       .setLngLat(firstResult.geometry.coordinates)

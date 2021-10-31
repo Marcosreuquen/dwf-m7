@@ -1038,12 +1038,38 @@
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
   integrity sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==
 
+"@types/geojson@*":
+  version "7946.0.8"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.8.tgz#30744afdb385e2945e22f3b033f897f76b1f12ca"
+  integrity sha512-1rkryxURpr6aWP7R786/UQOkJ3PcpQiWkAXBmdWc7ryFWqN6a4xfK7BtjXvFBKO9LjQ+MWQSWxYeZX1OApnArA==
+
 "@types/http-proxy@^1.17.5":
   version "1.17.7"
   resolved "https://registry.yarnpkg.com/@types/http-proxy/-/http-proxy-1.17.7.tgz#30ea85cc2c868368352a37f0d0d3581e24834c6f"
   integrity sha512-9hdj6iXH64tHSLTY+Vt2eYOGzSogC+JQ2H7bdPWkuh7KXP5qLllWx++t+K9Wk556c3dkDdPws/SpMRi0sdCT1w==
   dependencies:
     "@types/node" "*"
+
+"@types/leaflet@^0":
+  version "0.7.35"
+  resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-0.7.35.tgz#5eb474dee4ce4b126292cd0ba4db5e09190649a2"
+  integrity sha512-BK+pa9a9dYC1qJyYQulqkRI9N+ZnV4ycAmNSOUmom7C6xaAdmrhOoiCiDMhSQklyjPpasy3KWRTkTRTJuDbBSw==
+  dependencies:
+    "@types/geojson" "*"
+
+"@types/mapbox-gl@^2.4.2":
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/@types/mapbox-gl/-/mapbox-gl-2.4.2.tgz#b2d5d6572a49561eef0eb361afd92365027efc50"
+  integrity sha512-mKgjmhUN780YGy9ZEyJK0Sr9gMtERmTQimGsIa5WrBHPlBXdmjYfqtz8nSMI7hOnQFphcuSMyqQswaQESFLHsA==
+  dependencies:
+    "@types/geojson" "*"
+
+"@types/mapbox@^1.6.42":
+  version "1.6.42"
+  resolved "https://registry.yarnpkg.com/@types/mapbox/-/mapbox-1.6.42.tgz#e15d33d738b2242e490cc49985aa771ffc0050ef"
+  integrity sha512-mQlrYBOwqz/kGG8P5KOTXLRMlZFLNFDdxzNaEukig3Uh9I2ukk6LXg5yaCUS8bk3/3ie6o3h/ZKAaXuwTljpdw==
+  dependencies:
+    "@types/leaflet" "^0"
 
 "@types/node@*":
   version "16.11.1"
@@ -1054,6 +1080,13 @@
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
+
+"@types/sweetalert@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@types/sweetalert/-/sweetalert-2.0.4.tgz#8a7c2c1f4efa0ed0ef48e72e6ead550d672347fa"
+  integrity sha512-BSO9bAIUh/h1mfQgyMLniwTjysCV5Ktmy5JULmantIJBuZtHilIWNuM+O6myboyyHNv9uASXTc7Unh9GGp4srg==
+  dependencies:
+    sweetalert "*"
 
 "@vaadin/router@^1.7.4":
   version "1.7.4"
@@ -6261,7 +6294,7 @@ svgo@^2.3.0, svgo@^2.6.1:
     nanocolors "^0.1.12"
     stable "^0.1.8"
 
-sweetalert@^2.1.2:
+sweetalert@*, sweetalert@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/sweetalert/-/sweetalert-2.1.2.tgz#010baaa80d0dbdc86f96bfcaa96b490728594b79"
   integrity sha512-iWx7X4anRBNDa/a+AdTmvAzQtkN1+s4j/JJRWlHpYE8Qimkohs8/XnFcWeYHH2lMA8LRCa5tj2d244If3S/hzA==

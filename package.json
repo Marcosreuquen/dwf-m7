@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.7",
+    "@types/mapbox": "^1.6.42",
+    "@types/mapbox-gl": "^2.4.2",
+    "@types/sweetalert": "^2.0.4",
     "@vaadin/router": "^1.7.4",
     "algoliasearch": "^4.10.5",
     "bearer-token": "^2.0.2",

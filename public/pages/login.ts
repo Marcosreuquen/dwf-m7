@@ -19,7 +19,7 @@ class Login extends HTMLElement {
       </form>
     </div>
     `;
-    const form = this.querySelector(".login");
+    const form: any = this.querySelector(".login");
     form
       .querySelector("x-button")
       .addEventListener("buttonClicked", async (e) => {
@@ -55,7 +55,7 @@ class Login extends HTMLElement {
     </div>
     `;
 
-    const form = this.querySelector(".login");
+    const form: any = this.querySelector(".login");
     form
       .querySelector("x-button")
       .addEventListener("buttonClicked", async (e: any) => {
