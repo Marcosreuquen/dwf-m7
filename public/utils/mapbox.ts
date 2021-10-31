@@ -1,5 +1,5 @@
 //import mapbox, mapboxtoken, mapboxgl
-import * as MapboxClient from "mapbox";
+const MapboxClient = require("mapbox");
 import * as mapboxgl from "../../node_modules/mapbox-gl/dist/mapbox-gl.js";
 import "mapbox-gl/dist/mapbox-gl.css";
 

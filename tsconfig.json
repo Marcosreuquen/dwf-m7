@@ -4,8 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "outDir": "server-dist",
-    "skipLibCheck": true
+    "outDir": "server-dist"
   },
   "includes": ["./server/**/*.ts"]
 }
