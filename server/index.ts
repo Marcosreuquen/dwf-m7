@@ -238,9 +238,9 @@ app.post("/pets/report", checkBody, middlewareToken, async (req, res) => {
 });
 //---------------------------------------STATICS
 
-app.use(express.static(path.resolve(__dirname, "../dist")));
+app.use(express.static(path.resolve(__dirname, "../public")));
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../dist/index.html"));
+  res.sendFile(path.resolve(__dirname, "../public/index.html"));
 });
 
 //---------------------------------------LISTENER
