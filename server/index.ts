@@ -23,14 +23,13 @@ import {
   getSHA256ofSTRING,
   middlewareToken,
 } from "./middlewares";
-//cors aux
+//cors
 import * as cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 app.use(express.json({ limit: "100mb" }));
 app.use(cors());
-
 //---------------------------------------AUTH
 app.get("/users/exist", checkBody, async (req, res) => {
   //crear un User y un Auth; y devuelve el User.

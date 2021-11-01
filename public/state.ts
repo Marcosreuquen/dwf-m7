@@ -1,4 +1,4 @@
-const BASE_URL_API = "https://pets-app-mr.herokuapp.com/";
+const BASE_URL_API = "https://pets-app-mr.herokuapp.com";
 
 export const state = {
   data: {

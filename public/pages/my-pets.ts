@@ -3,8 +3,13 @@ import { state } from "../state";
 import * as map from "lodash/map";
 class MyPets extends HTMLElement {
   async connectedCallback() {
-    const { myPets } = await state.getMyPets();
-    myPets.length > 0 ? this.render(myPets) : this.render();
+    const { token } = state.getState().user;
+    if (token) {
+      const { myPets } = await state.getMyPets();
+      myPets.length < 0 ? this.render(myPets) : this.render();
+    } else {
+      Router.go("/login");
+    }
   }
   render(pets?) {
     this.innerHTML = pets

@@ -7,7 +7,7 @@
     "dev:fe": "parcel serve ./public/index.html",
     "dev": "yarn dev:fe && yarn dev:be",
     "build:be": "tsc",
-    "build:fe": "parcel build ./public/index.html --dist-dir ./public-dist",
+    "build:fe": "parcel build ./public/index.html --dist-dir ./dist",
     "build": "yarn build:be && yarn build:fe",
     "start": "node ./server/index.js"
   },
