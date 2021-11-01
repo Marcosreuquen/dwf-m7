@@ -9,7 +9,7 @@
     "build:be": "tsc",
     "build:fe": "parcel build ./public/index.html --dist-dir ./dist",
     "build": "yarn build:be && yarn build:fe",
-    "start": "node ./server-dist/index.js"
+    "start": "node ./server-dist/server/index.js"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.7",
