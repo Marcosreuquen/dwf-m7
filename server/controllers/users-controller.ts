@@ -25,7 +25,20 @@ export const UserController = {
     return await user.update({ name, email });
   },
   async myPets(id) {
-    return await (await User.findByPk(id, { include: [Pets] })).get("pets");
+    try {
+      const pets = await (
+        await User.findByPk(id, {
+          include: [{ model: Pets, where: { state: true } }],
+        })
+      ).get("pets");
+      if (pets) {
+        return pets;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.log(error);
+    }
   },
   async myReports(id) {
     return await (

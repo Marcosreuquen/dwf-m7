@@ -5,7 +5,12 @@ import Swal from "sweetalert2";
 class MyData extends HTMLElement {
   connectedCallback() {
     const cs = state.getState();
-    this.render(cs.user);
+    const { token } = state.getState().user;
+    if (token) {
+      this.render(cs.user);
+    } else {
+      Router.go("/login");
+    }
   }
   render(userData?) {
     this.innerHTML = `

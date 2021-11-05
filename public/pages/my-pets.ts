@@ -6,10 +6,24 @@ class MyPets extends HTMLElement {
     const { token } = state.getState().user;
     if (token) {
       const { myPets } = await state.getMyPets();
-      myPets.length < 0 ? this.render(myPets) : this.render();
+      if (myPets) {
+        myPets.length > 0 ? this.render(myPets) : this.render();
+      } else {
+        this.render();
+      }
     } else {
       Router.go("/login");
     }
+  }
+  addListener(container?) {
+    console.log(container);
+    map(container, (pet) => {
+      pet.addEventListener("report-pet", async (e) => {
+        const { id } = e.detail;
+        state.setPetData({ id: parseInt(id) });
+        Router.go("pet-data");
+      });
+    });
   }
   render(pets?) {
     this.innerHTML = pets
@@ -22,7 +36,7 @@ class MyPets extends HTMLElement {
           !pets
             ? `<x-text type="body">AUN NO REPORTASTE MASCOTAS PERDIDAS</x-text>`
             : map(pets, (pet) => {
-                return `<x-pet-card img=${pet.imgURL} petId=${pet.objectID}>${pet.name}</x-pet-card>`;
+                return `<x-pet-card img=${pet.imgURL} petId=${pet.id}>${pet.name}</x-pet-card>`;
               }).join("")
         }
       </div>
@@ -35,6 +49,7 @@ class MyPets extends HTMLElement {
       <x-text type="subtitle">Aun no reportaste mascotas perdidas</x-text>
     </div>
     `;
+    this.addListener(this.querySelectorAll("x-pet-card"));
   }
 }
 customElements.define("x-my-pets", MyPets);

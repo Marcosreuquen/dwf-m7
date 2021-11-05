@@ -135,17 +135,24 @@ export const state = {
       await fetch(`${BASE_URL_API}/pets?petId=${cs.petData.id}`)
     ).json();
     this.setState(cs);
+    return cs.petData;
   },
   setPetData(petData) {
     const cs = this.getState();
     cs.petData = petData;
     this.setState(cs);
   },
-  async editPet({ id, name, imgURL, _geoloc }) {
+  setPetGeoloc(geoloc: { lat: number; lng: number }) {
     const cs = this.getState();
-    const [latitude, longitude] = _geoloc.split(",");
-    const lat = parseFloat(latitude);
-    const lng = parseFloat(longitude);
+    cs.petData.lat = geoloc.lat;
+    cs.petData.lng = geoloc.lng;
+    this.setState(cs);
+  },
+
+  async editPet({ id, name, imgURL }) {
+    const cs = this.getState();
+    const lat = cs.petData.lat;
+    const lng = cs.petData.lng;
 
     const petEdited = await (
       await fetch(BASE_URL_API + `/me/pets?petId=${id}`, {
@@ -164,11 +171,11 @@ export const state = {
     ).json();
     return petEdited;
   },
-  async createPet({ name, imgURL, _geoloc }) {
+  async createPet({ name, imgURL }) {
     const cs = this.getState();
-    var [latitude, longitude] = _geoloc.split(",");
-    const lat = parseFloat(latitude);
-    const lng = parseFloat(longitude);
+    const lat = cs.petData.lat;
+    const lng = cs.petData.lng;
+
     const petEdited = await (
       await fetch(BASE_URL_API + `/me/pets`, {
         method: "POST",
@@ -190,7 +197,7 @@ export const state = {
     const cs = this.getState();
     const petEdited = await (
       await fetch(BASE_URL_API + `/me/pets?petId=${id}`, {
-        method: "POST",
+        method: "DELETE",
         headers: {
           Authorization: `bearer ${cs.user.token}`,
         },

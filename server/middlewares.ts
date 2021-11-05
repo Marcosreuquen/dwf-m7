@@ -37,7 +37,7 @@ export async function middlewareToken(req, res, next) {
   });
 }
 
-export function getSHA256ofSTRING(req, res, next) {
+export function encryptPassword(req, res, next) {
   //create a hash "sha256" from an input (password)
   const { password } = req.body;
   req._SHA256Password = crypto

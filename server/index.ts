@@ -1,8 +1,5 @@
 //Enviroment
 import "./enviroment";
-//Connection
-import "./models/db/connection";
-import "./models/db/sync";
 //packages
 import * as express from "express";
 import * as path from "path";
@@ -12,15 +9,15 @@ import { PetsController } from "./controllers/pets-controller";
 import { ReportsController } from "./controllers/repots-controller";
 import { AuthController } from "./controllers/auths-controller";
 //libs
-import { cloudinary, uploadImgToCloudinary } from "./lib/cloudinary";
-import { pets_index_algolia, users_index_algolia } from "./lib/algolia";
+import { uploadImgToCloudinary } from "./lib/cloudinary";
+import { algoliaController } from "./lib/algolia";
 import { sendEmail } from "./lib/sendgrid";
 //middlewares
 import {
   checkBody,
   checkId,
   createToken,
-  getSHA256ofSTRING,
+  encryptPassword,
   middlewareToken,
 } from "./middlewares";
 //cors
@@ -36,16 +33,14 @@ app.get("/users/exist", checkBody, async (req, res) => {
   //recibe en el body: {email, password, lat, lng }
   try {
     const { email } = req.query;
-
     const exist = await UserController.userExist(email);
-
     res.send({ email, exist });
   } catch (err) {
     res.send({ err });
   }
 });
 
-app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
+app.post("/auth", checkBody, encryptPassword, async (req, res) => {
   //crear un User y un Auth; y devuelve el User.
   //recibe en el body: {email, password }
   try {
@@ -62,7 +57,7 @@ app.post("/auth", checkBody, getSHA256ofSTRING, async (req, res) => {
   }
 });
 
-app.post("/auth/token", checkBody, getSHA256ofSTRING, async (req, res) => {
+app.post("/auth/token", checkBody, encryptPassword, async (req, res) => {
   //SignIn - POST /auth/token (pedís token) Recibe: { email:string, password:string }
   //Este endpoint chequea en la tabla auth que esos datos concuerden con los guardados y genera un token con un objeto que tenga solo el id del user.
   const { email } = req.body;
@@ -120,16 +115,7 @@ app.post("/me/pets", checkBody, middlewareToken, async (req, res) => {
       { name, lat, lng, imgURL },
       req._user.id
     );
-
-    const algoliaRes = await pets_index_algolia.saveObject({
-      objectID: petCreated.get("id"),
-      name: petCreated.get("name"),
-      imgURL,
-      _geoloc: {
-        lat: petCreated.get("lat"),
-        lng: petCreated.get("lng"),
-      },
-    });
+    const algoliaRes = await algoliaController.createPet(petCreated);
     res.send({ petCreated, algoliaRes });
   } catch (err) {
     res.send({ err });
@@ -147,15 +133,8 @@ app.put("/me/pets", checkBody, middlewareToken, async (req, res) => {
       { name, lat, lng, imgURL },
       petId
     );
-    const algoliaRes = await pets_index_algolia.partialUpdateObject({
-      objectID: petUpdated.get("id"),
-      name: petUpdated.get("name"),
-      imgURL,
-      _geoloc: {
-        lat: petUpdated.get("lat"),
-        lng: petUpdated.get("lng"),
-      },
-    });
+    const algoliaRes = await algoliaController.updatePet(petUpdated);
+
     res.send({ petUpdated, algoliaRes });
   } catch (err) {
     res.send({ err });
@@ -165,12 +144,9 @@ app.put("/me/pets", checkBody, middlewareToken, async (req, res) => {
 app.get("/pets/around", async (req, res) => {
   //Busca en algolia mascotas perdidas cerca de un punto.
   const { lat, lng } = req.query;
-
   try {
-    const { hits } = await pets_index_algolia.search("", {
-      aroundLatLng: `${lat},${lng}`,
-    });
-    res.send(hits);
+    const response = await algoliaController.search(lat, lng);
+    res.send(response);
   } catch (err) {
     res.send(err);
   }
@@ -191,6 +167,7 @@ app.delete("/me/pets", middlewareToken, async (req, res) => {
   const { petId } = req.query;
   try {
     const deletedPet = await PetsController.deletePet(petId);
+    await algoliaController.deletePet(petId);
     if (deletedPet) {
       res.send({ message: `Pet ${petId} has been deleted succesfully` });
     } else {
@@ -223,6 +200,7 @@ app.post("/pets/report", checkBody, middlewareToken, async (req, res) => {
       userId,
       data
     );
+    console.log(created);
     const sendedEmail = await sendEmail(
       pet.getDataValue("user").email,
       created.getDataValue("tel"),

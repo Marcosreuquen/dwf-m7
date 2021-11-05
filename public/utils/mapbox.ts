@@ -2,10 +2,12 @@
 const MapboxClient = require("mapbox");
 import * as mapboxgl from "../../node_modules/mapbox-gl/dist/mapbox-gl.js";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { Marker } from "mapbox-gl";
+import { state } from "../state";
 
 const TOKEN = process.env.MAPBOX_TOKEN;
 
-export async function mapping() {
+export async function mapping(initial?) {
   const form: any = document.querySelector(".pet-data");
   const mapboxClient = new MapboxClient(TOKEN);
 
@@ -14,6 +16,8 @@ export async function mapping() {
     return new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/streets-v11",
+      center: initial ? initial : [0, 0],
+      zoom: initial ? 8 : 0,
     });
   }
 
@@ -35,20 +39,28 @@ export async function mapping() {
   }
 
   const map = initMap();
+  let initialMarker;
+  if (initial) {
+    initialMarker = new mapboxgl.Marker().setLngLat(initial).addTo(map);
+  }
+
   initSearchForm(async function (results) {
+    if (initial) {
+      initialMarker.remove();
+    }
+
     const firstResult = results[0];
     const marker = new mapboxgl.Marker({ color: "#222", draggable: true })
       .setLngLat(firstResult.geometry.coordinates)
       .addTo(map);
     map.setCenter(firstResult.geometry.coordinates);
-    map.setZoom(14);
-    form.geoloc.value = firstResult.geometry.coordinates;
+    map.setZoom(10);
+    const lngLat = marker.getLngLat();
+    state.setPetGeoloc({ lat: lngLat.lat, lng: lngLat.lng });
 
     marker.on("dragend", () => {
       const lngLat = marker.getLngLat();
-      // form.style.display = "block";
-      form.geoloc.value = `${lngLat.lng}, ${lngLat.lat}`;
-      // coordinates.innerHTML = `Longitude: ${lngLat.lng}<br />Latitude: ${lngLat.lat}`;
+      state.setPetGeoloc({ lat: lngLat.lat, lng: lngLat.lng });
     });
   });
 }

@@ -15,7 +15,7 @@ class PetData extends HTMLElement {
       this.render();
     }
   }
-  async render(pet?) {
+  render(pet?) {
     const type = pet ? "Editar" : "Reportar";
 
     this.innerHTML = `
@@ -28,7 +28,7 @@ class PetData extends HTMLElement {
         <input type="text" name="name" class="is-success">
         </label>
         <label class="label" id="img">
-          <img class="imgUrlPet" name="imgURL" src=${missingImg}>
+          <img class="imgUrlPet" name="imgURL" src=${missingImg} crossorigin="anonymous">
           <x-button type="secondary" id="buttonImg">agregar/modificar foto</x-button>
         </label>
         <label class="label">
@@ -38,24 +38,25 @@ class PetData extends HTMLElement {
           <input type="text" name="geoloc" class="search-geoloc">
         </label>
         <x-button class="submit" type="primary">${type}</x-button>
-        <x-button type=${pet ? "cancel" : "secondary"} class=${
-      pet ? "cancel" : "finded"
-    }>${pet ? "Cancelar" : "Reportar como encontrado"}</x-button>
+        <x-button type=${pet ? "secondary" : "cancel"} class=${
+      pet ? "finded" : "finded"
+    }>${pet ? "Reportar como encontrado" : "Cancelar"}</x-button>
       </form>
     </div>
     `;
+    const pic = this.querySelector(".imgUrlPet");
+    const petDataForm: any = this.querySelector(".pet-data");
+    const buttonImg = this.querySelector("#buttonImg");
+
     if (pet) {
       //inserta los datos de la mascota en el formulario
-      const petDataForm: any = this.querySelector(".pet-data");
       petDataForm.name.value = pet.name;
-      petDataForm.querySelector(".imgUrlPet").src = pet.imgURL;
-      petDataForm.geoloc.value = `${pet._geoloc.lat},${pet._geoloc.lat}`;
+      pic.setAttribute("src", pet.imgURL);
+      petDataForm.geoloc.value = `${pet.lat},${pet.lng}`;
     }
-    const buttonImg = this.querySelector("#buttonImg");
-    const pic = this.querySelector(".imgUrlPet");
 
     //inicializa el mapa
-    mapping();
+    pet ? mapping([pet.lat, pet.lng]) : mapping();
     //inicializa dropzone
     dropzonedImg(pic, buttonImg);
 
@@ -67,7 +68,6 @@ class PetData extends HTMLElement {
           id: pet.id,
           name: petDataForm.name.value,
           imgURL: petDataForm.imgURL.getAttribute("src"),
-          _geoloc: petDataForm.geoloc.value,
         });
         Swal.fire({ icon: "success" });
       }
@@ -76,22 +76,22 @@ class PetData extends HTMLElement {
         state.createPet({
           name: petDataForm.name.value,
           imgURL: petDataForm.imgURL.getAttribute("src"),
-          _geoloc: petDataForm.geoloc.value,
         });
         Swal.fire({ icon: "success" });
       }
       console.log();
     });
-    this.querySelector(".cancel").addEventListener("buttonClicked", (e) => {
+    this.querySelector(".cancel")?.addEventListener("buttonClicked", (e) => {
       //limpiar formulario
       const petDataForm: any = this.querySelector(".pet-data");
       petDataForm.reset();
     });
-    this.querySelector(".finded").addEventListener("buttonClicked", (e) => {
+    this.querySelector(".finded")?.addEventListener("buttonClicked", (e) => {
       //enviar al servidor que se encontró a la
       state.findedPet(pet.id);
       Swal.fire({ icon: "success", title: "Nos alegra mucho!" });
       const petDataForm: any = this.querySelector(".pet-data");
+      state.data.petData = {};
       petDataForm.reset();
     });
   }
