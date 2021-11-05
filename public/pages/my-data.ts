@@ -5,8 +5,8 @@ import Swal from "sweetalert2";
 class MyData extends HTMLElement {
   connectedCallback() {
     const cs = state.getState();
-    const { token } = state.getState().user;
-    if (token) {
+    const { email } = state.getState().user;
+    if (email) {
       this.render(cs.user);
     } else {
       Router.go("/login");
